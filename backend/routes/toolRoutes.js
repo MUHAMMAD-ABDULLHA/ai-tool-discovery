@@ -1,0 +1,27 @@
+import express from "express";
+import Tool from "../model/Tool.js";
+
+const router = express.Router();
+
+// List Tools
+router.get("/", async (req, res) => {
+    try {
+        const tools = await Tool.find();
+        res.json(tools);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Add Tool
+router.post("/", async (req, res) => {
+    try {
+        const newTool = new Tool(req.body);
+        const savedTool = await newTool.save();
+        res.status(201).json(savedTool);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+export default router;
