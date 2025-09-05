@@ -6,7 +6,7 @@ import toolRoutes from "./routes/toolRoutes.js";
 import "./db/db.js"; // DB connection
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
-
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -20,6 +20,7 @@ app.use(cookieParser());
 // Routes
 app.use("/tools", toolRoutes);
 app.use("/auth", authRoutes);
+app.use("/reviews", reviewRoutes);
 
 // Port config
 const port = process.env.PORT || 5000;
