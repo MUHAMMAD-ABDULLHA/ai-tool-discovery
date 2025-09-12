@@ -16,7 +16,7 @@ import { authenticateToken, requireRole } from "../middleware/authMiddleware.js"
 const router = express.Router();
 
 // Public routes
-router.get("/tools/:toolId/reviews", getToolReviews);
+router.get("/tools/:toolId", getToolReviews);
 
 // Protected routes (require authentication)
 router.post("/tools/:toolId/reviews", authenticateToken, createReview);

@@ -64,7 +64,8 @@ const App = () => {
    <Routes>
     {/* Public Routes (no NavBar) */}
     <Route path="/login" element={<Login /> }/>
-    <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Registration />} />
+    {/* <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <Registration />} /> */}
+    <Route path="/register" element={<Registration />} />
     <Route path="/tools" element={<ToolList />} />
     <Route path="/tools/:toolId" element={<ToolDetail />} />
 

@@ -12,7 +12,15 @@ router.get("/", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
-
+router.get("/:id", async(req, res )=>{
+    try {
+        const tool = await Tool.findById(req.params.id);
+        console.log(tool);
+        res.json(tool);
+    }catch (err){
+        res.status(500).json({ error: err.message });
+    }
+})
 // Add Tool
 router.post("/", async (req, res) => {
     try {
