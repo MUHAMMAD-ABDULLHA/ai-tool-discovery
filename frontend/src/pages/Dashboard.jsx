@@ -82,36 +82,121 @@
 
 // export default Dashboard;
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import useAuthStore from '../store/AuthStore';
+// import React from 'react';
+// import { Link } from 'react-router-dom';
+// import useAuthStore from '../store/AuthStore';
+
+// const Dashboard = () => {
+//   const { user } = useAuthStore();
+
+//   return (
+//     <div className="min-h-screen bg-gray-100 p-8">
+//       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+//         <div className="flex justify-between items-center mb-6">
+//           <h1 className="text-3xl font-bold text-gray-800">
+//             Welcome, {user?.name}! 👋
+//           </h1>
+//           {/* 🔗 Navigation to Tools */}
+//           <Link
+//             to="/tools"
+//             className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition-colors"
+//           >
+//             Browse Tools
+//           </Link>
+//         </div>
+//         <p className="text-lg text-gray-600 mb-4">
+//           You are logged in as <strong>{user?.role}</strong>.
+//         </p>
+//         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
+//           <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
+//           <p><strong>Name:</strong> {user.name}</p>
+//           <p><strong>Email:</strong> {user.email}</p>
+//           <p><strong>Role:</strong> {user.role}</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
+
+
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAuthStore from "../store/AuthStore";
 
 const Dashboard = () => {
-  const { user } = useAuthStore();
+  const { user, setUser, setToken } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    navigate("/login");
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-        <div className="flex justify-between items-center mb-6">
+    <div className="min-h-screen bg-gray-100">
+      {/* 🔹 Navbar */}
+      <nav className="bg-indigo-600 text-white px-6 py-3 shadow-md">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          {/* Brand / Logo */}
+          <Link to="/dashboard" className="text-xl font-bold tracking-wide">
+            BrandPromo
+          </Link>
+
+          {/* Links */}
+          <div className="flex gap-6 items-center">
+            <Link
+              to="/tools"
+              className="hover:text-indigo-200 transition-colors"
+            >
+              Tools
+            </Link>
+            <Link
+              to="/bookmarks"
+              className="hover:text-indigo-200 transition-colors"
+            >
+              Bookmarks
+            </Link>
+            <Link
+              to="/dashboard"
+              className="hover:text-indigo-200 transition-colors"
+            >
+              Profile
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="bg-red-500 px-3 py-1 rounded-md hover:bg-red-400 transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* 🔹 Page Content */}
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-6">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800">
             Welcome, {user?.name}! 👋
           </h1>
-          {/* 🔗 Navigation to Tools */}
-          <Link
-            to="/tools"
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition-colors"
-          >
-            Browse Tools
-          </Link>
+          <p className="text-lg text-gray-600">
+            You are logged in as <strong>{user?.role}</strong>.
+          </p>
         </div>
-        <p className="text-lg text-gray-600 mb-4">
-          You are logged in as <strong>{user?.role}</strong>.
-        </p>
+
         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
           <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
-          <p><strong>Name:</strong> {user.name}</p>
-          <p><strong>Email:</strong> {user.email}</p>
-          <p><strong>Role:</strong> {user.role}</p>
+          <p>
+            <strong>Name:</strong> {user.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
+          <p>
+            <strong>Role:</strong> {user.role}
+          </p>
         </div>
       </div>
     </div>
