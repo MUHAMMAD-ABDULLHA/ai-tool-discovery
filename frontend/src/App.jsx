@@ -55,6 +55,8 @@ import ProtectedLayout from './components/ProtectedLayout';
 import useAuthStore from './store/AuthStore';
 import ToolDetail from './pages/ToolDetail';
 import ToolList from './components/ToolList';
+import Bookmarks from './components/Bookmarks';
+import ToolPage from './components/Tools/ToolPage';
 
 const App = () => {
  const { token } = useAuthStore();
@@ -73,6 +75,8 @@ const App = () => {
     <Route element={<ProtectedLayout />}>
      <Route element={<ProtectedRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/bookmarks" element={<Bookmarks />} />
+      <Route path="/tools/new" element={<ToolPage />} />
      </Route>
      Admin-only route
      {/* <Route element={<ProtectedRoute allowedRoles={['admin']} />}>

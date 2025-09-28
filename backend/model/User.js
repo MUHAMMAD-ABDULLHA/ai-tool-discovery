@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
         lowercase: true,
         match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
     },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ["user", "admin","startup"], default: "user" },
     status: { type: String, enum: ["active", "inactive"], default: "active" },
     createdAt: { type: Date, default: Date.now },
     refreshToken: { type: String }

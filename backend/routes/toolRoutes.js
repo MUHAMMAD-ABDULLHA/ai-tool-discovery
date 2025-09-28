@@ -22,15 +22,30 @@ router.get("/:id", async(req, res )=>{
     }
 })
 // Add Tool
-router.post("/", async (req, res) => {
-    try {
-        const newTool = new Tool(req.body);
-        const savedTool = await newTool.save();
-        res.status(201).json(savedTool);
-    } catch (err) {
-        res.status(400).json({ error: err.message });
-    }
+// router.post("/", async (req, res) => {
+//     try {
+//         const newTool = new Tool(req.body);
+//         const savedTool = await newTool.save();
+//         res.status(201).json(savedTool);
+//     } catch (err) {
+//         res.status(400).json({ error: err.message });
+//     }
+// });
+
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const newTool = new Tool({
+      ...req.body,
+      userId: req.user.id, // 🔹 attach the creator's ID
+    });
+
+    const savedTool = await newTool.save();
+    res.status(201).json(savedTool);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
 });
+
 router.get("/category/:category", async (req, res) => {
     try {
         const tools = await Tool.find({ category: req.params.category });

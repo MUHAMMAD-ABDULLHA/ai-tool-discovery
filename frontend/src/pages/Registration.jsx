@@ -63,6 +63,7 @@ const Registeration = () => {
               className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md"
             >
               <option value="user">User</option>
+              <option value="startup">Startup</option>
               <option value="admin">Admin</option>
             </select>
           </div>
