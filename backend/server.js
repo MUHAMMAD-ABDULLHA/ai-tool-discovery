@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import bookmarkRoutes from "./routes/bookmarkRoutes.js";
-
+import toolAnalyticsRoutes from "./routes/toolAnalyticsRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -23,6 +23,7 @@ app.use("/tools", toolRoutes);
 app.use("/auth", authRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/bookmarks", bookmarkRoutes);
+app.use("/analytics", toolAnalyticsRoutes);
 
 // Port config
 const port = process.env.PORT || 5000;

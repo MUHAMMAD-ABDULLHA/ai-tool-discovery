@@ -1,5 +1,6 @@
 import express from "express";
 import Tool from "../model/Tool.js";
+import { authenticateToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.get("/:id", async(req, res )=>{
 //     }
 // });
 
-router.post("/", authMiddleware, async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   try {
     const newTool = new Tool({
       ...req.body,
