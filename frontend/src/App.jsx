@@ -57,6 +57,7 @@ import ToolDetail from './pages/ToolDetail';
 import ToolList from './components/ToolList';
 import Bookmarks from './components/Bookmarks';
 import ToolPage from './components/Tools/ToolPage';
+import LandingPage from './components/LandingPage/LandingPage'
 
 const App = () => {
  const { token } = useAuthStore();
@@ -70,6 +71,7 @@ const App = () => {
     <Route path="/register" element={<Registration />} />
     <Route path="/tools" element={<ToolList />} />
     <Route path="/tools/:toolId" element={<ToolDetail />} />
+    <Route path="/landing" element={<LandingPage />} />
 
     {/* Protected Routes (wrapped with ProtectedLayout) */}
     <Route element={<ProtectedLayout />}>

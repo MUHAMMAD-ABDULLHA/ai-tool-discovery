@@ -27,6 +27,7 @@ const ToolDetail = () => {
         ]);
         setTool(toolRes.data);
         setReviews(reviewsRes.data);
+        console.log(reviewsRes.data);
       } catch (err) {
         setError('Failed to load tool or reviews.');
         console.error(err);

@@ -34,6 +34,7 @@ export const getToolReviews = async (req, res) => {
             .limit(limit);
         
         const total = await Review.countDocuments(query);
+        console.log(Review)
         
         res.status(200).json({
             success: true,
