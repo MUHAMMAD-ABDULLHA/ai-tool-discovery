@@ -1,10 +1,9 @@
-// src/api/axios.js
-
 import axios from 'axios';
-import useAuthStore from '../store/AuthStore';
+import { store } from '../store/store';
+import { setToken, logout } from '../slices/authSlice';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5000', // Adjust if your backend URL is different
+  baseURL: 'http://localhost:5000',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -13,9 +12,12 @@ const instance = axios.create({
 // Request interceptor to attach token
 instance.interceptors.request.use(
   (config) => {
-    const { token } = useAuthStore.getState();
+    const { token } = store.getState().auth;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔐 Axios: Token attached to request');
+    } else {
+      console.warn('⚠️ Axios: No token found in Redux store');
     }
     return config;
   },
@@ -24,31 +26,32 @@ instance.interceptors.request.use(
   }
 );
 
-// Response interceptor for token refresh
+// Response interceptor to handle token refresh
 instance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const { refreshToken, setToken } = useAuthStore.getState();
 
-    // Check if error is 401 and not a refresh token request
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
+
       try {
-        const res = await axios.post(`${instance.defaults.baseURL}/refresh`, {
+        const { refreshToken } = store.getState().auth;
+        const response = await axios.post('http://localhost:5000/auth/refresh', {
           refreshToken,
         });
-        setToken(res.data.token);
-        // Retry the original request with the new token
-        originalRequest.headers.Authorization = `Bearer ${res.data.token}`;
+
+        const { token } = response.data;
+        store.dispatch(setToken(token));
+
+        originalRequest.headers.Authorization = `Bearer ${token}`;
         return instance(originalRequest);
       } catch (refreshError) {
-        // Handle refresh token failure (e.g., redirect to login)
-        console.error('Unable to refresh token:', refreshError);
-        useAuthStore.getState().logout();
+        store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }
+
     return Promise.reject(error);
   }
 );

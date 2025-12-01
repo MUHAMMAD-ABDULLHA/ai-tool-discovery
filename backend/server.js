@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 import toolAnalyticsRoutes from "./routes/toolAnalyticsRoutes.js";
+import assetRoutes from "./routes/assetRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,7 @@ app.use("/auth", authRoutes);
 app.use("/reviews", reviewRoutes);
 app.use("/bookmarks", bookmarkRoutes);
 app.use("/analytics", toolAnalyticsRoutes);
+app.use("/assets", assetRoutes);
 
 // Port config
 const port = process.env.PORT || 5000;

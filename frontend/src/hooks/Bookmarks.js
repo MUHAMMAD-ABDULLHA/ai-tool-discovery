@@ -1,40 +1,34 @@
 import { useEffect, useCallback } from "react";
-import BookmarkStore from "../store/BookmarkStore";
+import { useSelector, useDispatch } from "react-redux";
+import { setBookmarks, setLoading, setError } from "../slices/bookmarkSlice";
 import axios from "../api/axios";
 
 const useBookmarks = () => {
-  const {
-    bookmarks,
-    loading,
-    error,
-    setBookmarks,
-    setLoading,
-    setError,
-  } = BookmarkStore();
+  const { bookmarks, loading, error } = useSelector((state) => state.bookmark);
+  const dispatch = useDispatch();
 
-  // 🔹 Fetch all user collections (GET /bookmarks) wrapped in useCallback
+  // 🔹 Fetch all user collections (GET /bookmarks)
   const fetchBookmarks = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    dispatch(setLoading(true));
+    dispatch(setError(null));
     try {
       const response = await axios.get("/bookmarks");
-      setBookmarks(response.data);
+      dispatch(setBookmarks(response.data));
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to fetch bookmarks");
+      dispatch(setError(err.response?.data?.error || "Failed to fetch bookmarks"));
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false));
     }
-  }, [setBookmarks, setLoading, setError]);
+  }, [dispatch]);
 
   // 🔹 Create a new collection (POST /bookmarks)
   const createCollection = async (collectionData) => {
     try {
       const response = await axios.post("/bookmarks", collectionData);
-      // Refresh bookmarks after creation
       fetchBookmarks();
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to create collection");
+      dispatch(setError(err.response?.data?.error || "Failed to create collection"));
       throw err;
     }
   };
@@ -46,7 +40,7 @@ const useBookmarks = () => {
       fetchBookmarks();
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to add tool");
+      dispatch(setError(err.response?.data?.error || "Failed to add tool"));
       throw err;
     }
   };
@@ -58,7 +52,7 @@ const useBookmarks = () => {
       fetchBookmarks();
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to remove tool");
+      dispatch(setError(err.response?.data?.error || "Failed to remove tool"));
       throw err;
     }
   };
@@ -70,7 +64,7 @@ const useBookmarks = () => {
       fetchBookmarks();
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.error || "Failed to delete collection");
+      dispatch(setError(err.response?.data?.error || "Failed to delete collection"));
       throw err;
     }
   };
@@ -78,7 +72,7 @@ const useBookmarks = () => {
   // ✅ Auto-fetch bookmarks when hook loads
   useEffect(() => {
     fetchBookmarks();
-  }, [fetchBookmarks]); // dependency fixed
+  }, [fetchBookmarks]);
 
   return {
     bookmarks,

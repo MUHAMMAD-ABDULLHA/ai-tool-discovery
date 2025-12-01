@@ -1,10 +1,10 @@
-// src/pages/ToolDetail.jsx
-
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from '../api/axios';
-import useAuthStore from '../store/AuthStore';
-import {Link} from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { Bookmark } from 'lucide-react';
+import SaveToolModal from '../components/SaveToolModal';
+import useBookmarks from '../hooks/Bookmarks';
 
 const ToolDetail = () => {
   const { toolId } = useParams();
@@ -12,22 +12,27 @@ const ToolDetail = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { user } = useAuthStore();
-  
-  // State for new review form
+  const { user } = useSelector((state) => state.auth);
   const [newReview, setNewReview] = useState({ title: '', comment: '', rating: 5 });
+
+  // Bookmark logic
+  const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
+  const { bookmarks } = useBookmarks();
+  const isSaved = bookmarks.some(collection =>
+    collection.tools?.some(t => t.tool === toolId || t.tool._id === toolId)
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const [toolRes, reviewsRes] = await Promise.all([
-          axios.get(`/tools/${toolId}`), // You'd need to add this API route
+          axios.get(`/tools/${toolId}`),
           axios.get(`/reviews/tools/${toolId}`)
         ]);
         setTool(toolRes.data);
-        setReviews(reviewsRes.data);
-        console.log(reviewsRes.data);
+        // Check if reviews response has data array
+        setReviews(reviewsRes.data.data || reviewsRes.data || []);
       } catch (err) {
         setError('Failed to load tool or reviews.');
         console.error(err);
@@ -37,16 +42,22 @@ const ToolDetail = () => {
     };
     fetchData();
   }, [toolId]);
-  
+
   const handleReviewSubmit = async (e) => {
-      e.preventDefault();
-      try {
-          const res = await axios.post(`/reviews/tools/${toolId}`, newReview);
-          setReviews([...reviews, res.data]);
-          setNewReview({ title: '', comment: '', rating: 5 });
-      } catch (err) {
-          console.error('Failed to submit review.', err);
+    e.preventDefault();
+    try {
+      const res = await axios.post(`/reviews/tools/${toolId}`, newReview);
+      // Backend returns { success, message, data: reviewObject }
+      if (res.data.success && res.data.data) {
+        setReviews([...reviews, res.data.data]);
+        setNewReview({ title: '', comment: '', rating: 5 });
+        alert(res.data.message || 'Review submitted successfully!');
       }
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to submit review';
+      alert(errorMsg);
+    }
   };
 
   if (loading) return <div className="text-center p-8">Loading...</div>;
@@ -56,16 +67,33 @@ const ToolDetail = () => {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-        <div className="flex items-center mb-4">
-          <img src={tool.logo} alt={`${tool.name} logo`} className="w-16 h-16 rounded-full mr-4" />
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{tool.name}</h1>
-            <p className="text-md text-gray-500">{tool.category.replace('_', ' ')}</p>
+        <div className="flex justify-between items-start">
+          <div className="flex items-center mb-4">
+            {tool.logo && <img src={tool.logo} alt={`${tool.name} logo`} className="w-16 h-16 rounded-full mr-4" />}
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{tool.name}</h1>
+              <p className="text-md text-gray-500">{tool.category?.replace('_', ' ')}</p>
+            </div>
           </div>
+
+          {/* Save Button */}
+          {user && (
+            <button
+              onClick={() => setIsSaveModalOpen(true)}
+              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+              title={isSaved ? "Saved to collection" : "Save to collection"}
+            >
+              <Bookmark
+                size={32}
+                className={isSaved ? "fill-black text-black" : "text-gray-400"}
+              />
+            </button>
+          )}
         </div>
+
         <p className="text-gray-700 mb-4">{tool.description}</p>
         <div className="flex flex-wrap gap-2 mb-4">
-          {tool.useCases.map((useCase, index) => (
+          {tool.useCases?.map((useCase, index) => (
             <span key={index} className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
               {useCase}
             </span>
@@ -79,7 +107,6 @@ const ToolDetail = () => {
         </div>
       </div>
 
-      {/* Reviews Section */}
       <div className="bg-white rounded-xl shadow-lg p-8">
         <h2 className="text-2xl font-bold mb-4">Reviews</h2>
         {user ? (
@@ -87,41 +114,75 @@ const ToolDetail = () => {
             <h3 className="text-lg font-semibold">Write a Review</h3>
             <div>
               <label className="block text-sm font-medium text-gray-700">Title</label>
-              <input type="text" value={newReview.title} onChange={(e) => setNewReview({ ...newReview, title: e.target.value })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required />
+              <input
+                type="text"
+                value={newReview.title}
+                onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                required
+                maxLength={100}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Comment</label>
-              <textarea value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })} rows="3" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required></textarea>
+              <textarea
+                value={newReview.comment}
+                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                rows="3"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                required
+                maxLength={1000}
+              ></textarea>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Rating</label>
-              <select value={newReview.rating} onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm" required>
+              <select
+                value={newReview.rating}
+                onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                required
+              >
                 {[5, 4, 3, 2, 1].map(r => <option key={r} value={r}>{r} Stars</option>)}
               </select>
             </div>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">Submit Review</button>
+            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+              Submit Review
+            </button>
           </form>
         ) : (
-          <p className="text-center text-gray-600">Please <Link to="/login" className="text-indigo-600 hover:underline">log in</Link> to leave a review.</p>
+          <p className="text-center text-gray-600">
+            Please <Link to="/login" className="text-indigo-600 hover:underline">log in</Link> to leave a review.
+          </p>
         )}
-        
+
         {reviews.length > 0 ? (
           <div className="space-y-4">
             {reviews.map(review => (
               <div key={review._id} className="border-b pb-4">
                 <div className="flex justify-between items-center">
                   <h4 className="font-semibold">{review.title}</h4>
-                  <span className="text-yellow-500">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                  <span className="text-yellow-500">
+                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                  </span>
                 </div>
                 <p className="text-sm text-gray-600">{review.comment}</p>
-                <p className="text-xs text-gray-500 mt-1">Reviewed by: {review.user?.name || 'Anonymous'}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Reviewed by: {review.user?.name || 'Anonymous'}
+                </p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-gray-500">No reviews yet.</p>
+          <p className="text-gray-500">No reviews yet. Be the first to review!</p>
         )}
       </div>
+
+      {/* Save Modal */}
+      <SaveToolModal
+        isOpen={isSaveModalOpen}
+        onClose={() => setIsSaveModalOpen(false)}
+        toolId={toolId}
+      />
     </div>
   );
 };

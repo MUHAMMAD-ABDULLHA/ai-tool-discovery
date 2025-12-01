@@ -1,18 +1,19 @@
 import React from "react";
 import ToolForm from "./ToolForm";
 import Tools from "../../hooks/Tools";
-import AuthStore from "../../store/AuthStore"; // assume you keep token here
+import { useSelector } from "react-redux";
 
 const ToolPage = () => {
   const { createTool } = Tools();
-  const { token } = AuthStore(); // 🔐 your auth store with JWT
+  const { token } = useSelector((state) => state.auth);
 
   const handleCreateTool = async (toolData) => {
     try {
       await createTool(toolData, token);
       alert("Tool created successfully!");
     } catch (err) {
-      alert("Failed to create tool", err);
+      alert("Failed to create tool");
+      console.error(err);
     }
   };
 

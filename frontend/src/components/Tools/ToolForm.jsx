@@ -1,6 +1,10 @@
 import React, { useState } from "react";
+import ImageUpload from "../ImageUpload";
+import { useSelector } from "react-redux";
 
 const ToolForm = ({ onSubmit, token }) => {
+  const { user } = useSelector((state) => state.auth);
+
   const [form, setForm] = useState({
     name: "",
     logo: "",
@@ -11,19 +15,26 @@ const ToolForm = ({ onSubmit, token }) => {
     link: "",
   });
 
+  const [useUrlInput, setUseUrlInput] = useState(false);
+
+  console.log('🔍 ToolForm - Current user from Redux:', user);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
+  const handleImageUploadComplete = (uploadedAsset) => {
+    setForm({ ...form, logo: uploadedAsset.imageUrl });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Split useCases by comma
     const formattedData = {
       ...form,
       useCases: form.useCases.split(",").map((u) => u.trim()),
     };
-    onSubmit(formattedData, token); // 🔑 pass token here
+    onSubmit(formattedData, token);
   };
 
   return (
@@ -49,19 +60,68 @@ const ToolForm = ({ onSubmit, token }) => {
             />
           </div>
 
-          {/* Logo */}
+          {/* Logo - Image Upload or URL */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
-              Logo URL
-            </label>
-            <input
-              type="text"
-              name="logo"
-              value={form.logo}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="https://example.com/logo.png"
-            />
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-neutral-dark">
+                Tool Logo
+              </label>
+              <button
+                type="button"
+                onClick={() => setUseUrlInput(!useUrlInput)}
+                className="text-xs text-primary hover:underline"
+              >
+                {useUrlInput ? "Use Image Upload" : "Use URL Instead"}
+              </button>
+            </div>
+
+            {useUrlInput ? (
+              <input
+                type="text"
+                name="logo"
+                value={form.logo}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder="https://example.com/logo.png"
+              />
+            ) : (
+              <div>
+                {!form.logo ? (
+                  <ImageUpload
+                    onUploadComplete={handleImageUploadComplete}
+                    assetType="tool_logo"
+                    tags={["tool", "logo"]}
+                  />
+                ) : (
+                  <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <img
+                          src={form.logo}
+                          alt="Logo preview"
+                          className="w-12 h-12 rounded object-cover"
+                        />
+                        <div>
+                          <p className="text-sm font-medium text-neutral-dark">
+                            Logo uploaded successfully
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Ready to submit
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, logo: "" })}
+                        className="text-sm text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Category */}

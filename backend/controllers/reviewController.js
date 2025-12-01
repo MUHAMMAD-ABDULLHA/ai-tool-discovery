@@ -1,5 +1,5 @@
 import Review from "../model/Review.js";
-import Tool  from "../model/Tool.js";
+import Tool from "../model/Tool.js";
 
 // @desc    Get all reviews for a tool
 // @route   GET /api/tools/:toolId/reviews
@@ -12,13 +12,13 @@ export const getToolReviews = async (req, res) => {
         const skip = (page - 1) * limit;
         const sortBy = req.query.sortBy || "createdAt";
         const sortOrder = req.query.sortOrder === "asc" ? 1 : -1;
-        
+
         // Build query - only show approved reviews to public
         let query = { tool: toolId, status: "approved" };
-        
+
         // If user is authenticated, they can see their own pending reviews too
         if (req.user) {
-            query = { 
+            query = {
                 tool: toolId,
                 $or: [
                     { status: "approved" },
@@ -26,16 +26,15 @@ export const getToolReviews = async (req, res) => {
                 ]
             };
         }
-        
+
         const reviews = await Review.find(query)
             .populate("user", "name email")
             .sort({ [sortBy]: sortOrder, helpful: -1 })
             .skip(skip)
             .limit(limit);
-        
+
         const total = await Review.countDocuments(query);
-        console.log(Review)
-        
+
         res.status(200).json({
             success: true,
             count: reviews.length,
@@ -60,29 +59,43 @@ export const createReview = async (req, res) => {
     try {
         const { toolId } = req.params;
         const { rating, title, comment } = req.body;
-        
+
+        console.log('🔍 Review submission attempt:', {
+            toolId,
+            userId: req.user?._id,
+            userEmail: req.user?.email,
+            rating,
+            title
+        });
+
         // Check if tool exists
         const tool = await Tool.findById(toolId);
         if (!tool) {
+            console.log('❌ Tool not found:', toolId);
             return res.status(404).json({
                 success: false,
                 message: "Tool not found"
             });
         }
-        
+
         // Check if user already reviewed this tool
         const alreadyReviewed = await Review.findOne({
             tool: toolId,
             user: req.user._id
         });
-        
+
+        console.log('🔍 Duplicate check result:', {
+            alreadyReviewed: !!alreadyReviewed,
+            reviewId: alreadyReviewed?._id
+        });
+
         if (alreadyReviewed) {
             return res.status(400).json({
                 success: false,
                 message: "You have already reviewed this tool"
             });
         }
-        
+
         // Create review
         const review = await Review.create({
             user: req.user._id,
@@ -91,16 +104,19 @@ export const createReview = async (req, res) => {
             title,
             comment
         });
-        
+
         // Populate user info for response
         await review.populate("user", "name email");
-        
+
+        console.log('✅ Review created successfully:', review._id);
+
         res.status(201).json({
             success: true,
             message: "Review submitted successfully. It will be visible after approval.",
             data: review
         });
     } catch (error) {
+        console.error('❌ Review creation error:', error);
         if (error.name === "ValidationError") {
             return res.status(400).json({
                 success: false,
@@ -122,16 +138,16 @@ export const createReview = async (req, res) => {
 export const updateReview = async (req, res) => {
     try {
         const { rating, title, comment } = req.body;
-        
+
         let review = await Review.findById(req.params.reviewId);
-        
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: "Review not found"
             });
         }
-        
+
         // Check if user owns the review or is admin
         if (review.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
             return res.status(403).json({
@@ -139,18 +155,18 @@ export const updateReview = async (req, res) => {
                 message: "Not authorized to update this review"
             });
         }
-        
+
         review = await Review.findByIdAndUpdate(
             req.params.reviewId,
-            { 
-                rating, 
-                title, 
-                comment, 
-                status: req.user.role === "admin" ? review.status : "pending" 
+            {
+                rating,
+                title,
+                comment,
+                status: req.user.role === "admin" ? review.status : "pending"
             },
             { new: true, runValidators: true }
         ).populate("user", "name email");
-        
+
         res.status(200).json({
             success: true,
             message: "Review updated successfully",
@@ -178,14 +194,14 @@ export const updateReview = async (req, res) => {
 export const deleteReview = async (req, res) => {
     try {
         const review = await Review.findById(req.params.reviewId);
-        
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: "Review not found"
             });
         }
-        
+
         // Check if user owns the review or is admin
         if (review.user.toString() !== req.user._id.toString() && req.user.role !== "admin") {
             return res.status(403).json({
@@ -193,9 +209,9 @@ export const deleteReview = async (req, res) => {
                 message: "Not authorized to delete this review"
             });
         }
-        
+
         await Review.findByIdAndDelete(req.params.reviewId);
-        
+
         res.status(200).json({
             success: true,
             message: "Review deleted successfully"
@@ -215,20 +231,20 @@ export const deleteReview = async (req, res) => {
 export const markHelpful = async (req, res) => {
     try {
         const review = await Review.findById(req.params.reviewId);
-        
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: "Review not found"
             });
         }
-        
+
         // Check if user already marked this review as helpful
         // (Implementation would require a separate model to track user votes)
-        
+
         review.helpful += 1;
         await review.save();
-        
+
         res.status(200).json({
             success: true,
             message: "Review marked as helpful",
@@ -249,16 +265,16 @@ export const markHelpful = async (req, res) => {
 export const reportReview = async (req, res) => {
     try {
         const { reason } = req.body;
-        
+
         const review = await Review.findById(req.params.reviewId);
-        
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: "Review not found"
             });
         }
-        
+
         // Check if user already reported this review
         if (review.reported && review.reportReasons && review.reportReasons.includes(req.user._id.toString())) {
             return res.status(400).json({
@@ -266,7 +282,7 @@ export const reportReview = async (req, res) => {
                 message: "You have already reported this review"
             });
         }
-        
+
         review.reported = true;
         if (!review.reportReasons) review.reportReasons = [];
         review.reportReasons.push({
@@ -274,9 +290,9 @@ export const reportReview = async (req, res) => {
             reason: reason,
             reportedAt: new Date()
         });
-        
+
         await review.save();
-        
+
         res.status(200).json({
             success: true,
             message: "Review reported successfully. Our team will review it shortly."
@@ -298,15 +314,15 @@ export const getUserReviews = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-        
+
         const reviews = await Review.find({ user: req.user._id })
             .populate("tool", "name slug")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
-        
+
         const total = await Review.countDocuments({ user: req.user._id });
-        
+
         res.status(200).json({
             success: true,
             count: reviews.length,
@@ -335,21 +351,21 @@ export const getAllReviews = async (req, res) => {
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
         const status = req.query.status || "all";
-        
+
         let query = {};
         if (status !== "all") {
             query.status = status;
         }
-        
+
         const reviews = await Review.find(query)
             .populate("user", "name email")
             .populate("tool", "name slug")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit);
-        
+
         const total = await Review.countDocuments(query);
-        
+
         res.status(200).json({
             success: true,
             count: reviews.length,
@@ -373,26 +389,26 @@ export const getAllReviews = async (req, res) => {
 export const updateReviewStatus = async (req, res) => {
     try {
         const { status } = req.body;
-        
+
         const review = await Review.findById(req.params.reviewId);
-        
+
         if (!review) {
             return res.status(404).json({
                 success: false,
                 message: "Review not found"
             });
         }
-        
+
         review.status = status;
         if (status === "approved") {
             review.reported = false;
             review.reportReasons = [];
         }
         await review.save();
-        
+
         // Recalculate tool rating
         await Review.calculateAverageRating(review.tool);
-        
+
         res.status(200).json({
             success: true,
             message: `Review ${status} successfully`,
@@ -415,16 +431,16 @@ export const getReportedReviews = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
-        
+
         const reviews = await Review.find({ reported: true })
             .populate("user", "name email")
             .populate("tool", "name slug")
             .sort({ updatedAt: -1 })
             .skip(skip)
             .limit(limit);
-        
+
         const total = await Review.countDocuments({ reported: true });
-        
+
         res.status(200).json({
             success: true,
             count: reviews.length,

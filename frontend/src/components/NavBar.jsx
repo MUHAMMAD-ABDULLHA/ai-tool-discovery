@@ -7,7 +7,7 @@
 
 // const NavBar = () => {
 //   const { user, logout } = AuthStore();
-  
+
 //   return (
 //     <nav className="bg-white shadow-md">
 //       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -39,14 +39,16 @@
 
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AuthStore from "../store/AuthStore";
+import { useSelector, useDispatch } from "react-redux";
+import { logout as logoutAction } from "../slices/authSlice";
 
 const NavBar = () => {
-  const { user, logout } = AuthStore();
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    dispatch(logoutAction());
     navigate("/login");
   };
 

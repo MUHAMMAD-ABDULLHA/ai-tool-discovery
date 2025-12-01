@@ -1,326 +1,96 @@
-// // src/pages/DashboardPage.jsx
-
-// import React from 'react';
-// import useAuth from '../hooks/Auth'; // Note: Corrected hook name
-
-// const Dashboard = () => {
-//  const { user, logout } = useAuth();
-
-//  // No need for useState or useEffect for profile data.
-//  // The 'user' object from the useAuth hook already contains this info.
-
-//  return (
-//   <div className="min-h-screen bg-gray-100 p-8">
-//    <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-//     <div className="flex justify-between items-center mb-6">
-//      <h1 className="text-3xl font-bold text-gray-800">
-//       Welcome, {user?.name}! 👋
-//      </h1>
-//      <button
-//       onClick={logout}
-//       className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-//      >
-//       Logout
-//      </button>
-//     </div>
-//     <p className="text-lg text-gray-600 mb-4">
-//      You are logged in as a **{user?.role}**.
-//     </p>
-//     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-//      <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
-//      <p><strong>Name:</strong> {user.name}</p>
-//      <p><strong>Email:</strong> {user.email}</p>
-//      <p><strong>Role:</strong> {user.role}</p>
-//     </div>
-//    </div>
-//   </div>
-//  );
-// };
-
-// export default Dashboard;
-
-// src/pages/DashboardPage.jsx
-
-// import React from 'react';
-// import useAuthStore from '../store/AuthStore';
-
-// /*************  ✨ Windsurf Command ⭐  *************/
-// /**
-//  * Dashboard component
-//  * 
-//  * This component displays a welcome message with the user's name and 
-//  * their role, and also displays a profile section with the user's name, 
-//  * email, and role.
-//  * 
-//  * @returns {JSX.Element} Dashboard component
-//  */
-// /*******  5f87e4dd-079c-4142-a012-ec3016c5154d  *******/
-// const Dashboard = () => {
-//   const { user } = useAuthStore();
-
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-8">
-//       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-//         <div className="flex justify-between items-center mb-6">
-//           <h1 className="text-3xl font-bold text-gray-800">
-//             Welcome, {user?.name}! 👋
-//           </h1>
-//         </div>
-//         <p className="text-lg text-gray-600 mb-4">
-//           You are logged in as a **{user?.role}**.
-//         </p>
-//         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-//           <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
-//           <p><strong>Name:</strong> {user.name}</p>
-//           <p><strong>Email:</strong> {user.email}</p>
-//           <p><strong>Role:</strong> {user.role}</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-// import React from 'react';
-// import { Link } from 'react-router-dom';
-// import useAuthStore from '../store/AuthStore';
-
-// const Dashboard = () => {
-//   const { user } = useAuthStore();
-
-//   return (
-//     <div className="min-h-screen bg-gray-100 p-8">
-//       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-//         <div className="flex justify-between items-center mb-6">
-//           <h1 className="text-3xl font-bold text-gray-800">
-//             Welcome, {user?.name}! 👋
-//           </h1>
-//           {/* 🔗 Navigation to Tools */}
-//           <Link
-//             to="/tools"
-//             className="bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700 transition-colors"
-//           >
-//             Browse Tools
-//           </Link>
-//         </div>
-//         <p className="text-lg text-gray-600 mb-4">
-//           You are logged in as <strong>{user?.role}</strong>.
-//         </p>
-//         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-//           <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
-//           <p><strong>Name:</strong> {user.name}</p>
-//           <p><strong>Email:</strong> {user.email}</p>
-//           <p><strong>Role:</strong> {user.role}</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-
-// import React from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import useAuthStore from "../store/AuthStore";
-
-// const Dashboard = () => {
-//   const { user, setUser, setToken } = useAuthStore();
-//   const navigate = useNavigate();
-
-//   const handleLogout = () => {
-//     setUser(null);
-//     setToken(null);
-//     navigate("/login");
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-gray-100">
-//       {/* 🔹 Navbar */}
-//       <nav className="bg-indigo-600 text-white px-6 py-3 shadow-md">
-//         <div className="max-w-6xl mx-auto flex justify-between items-center">
-//           {/* Brand / Logo */}
-//           <Link to="/dashboard" className="text-xl font-bold tracking-wide">
-//             BrandPromo
-//           </Link>
-
-//           {/* Links */}
-//           <div className="flex gap-6 items-center">
-//             <Link
-//               to="/tools"
-//               className="hover:text-indigo-200 transition-colors"
-//             >
-//               Tools
-//             </Link>
-//             <Link
-//               to="/bookmarks"
-//               className="hover:text-indigo-200 transition-colors"
-//             >
-//               Bookmarks
-//             </Link>
-//             <Link
-//               to="/dashboard"
-//               className="hover:text-indigo-200 transition-colors"
-//             >
-//               Profile
-//             </Link>
-//           </div>
-//         </div>
-//       </nav>
-
-//       {/* 🔹 Page Content */}
-//       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-6">
-//         <div className="mb-6">
-//           <h1 className="text-3xl font-bold text-gray-800">
-//             Welcome, {user?.name}! 👋
-//           </h1>
-//           <p className="text-lg text-gray-600">
-//             You are logged in as <strong>{user?.role}</strong>.
-//           </p>
-//         </div>
-
-//         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-//           <h2 className="text-2xl font-semibold mb-3">Your Profile</h2>
-//           <p>
-//             <strong>Name:</strong> {user.name}
-//           </p>
-//           <p>
-//             <strong>Email:</strong> {user.email}
-//           </p>
-//           <p>
-//             <strong>Role:</strong> {user.role}
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
-
-
-// import React from "react";
-// import { Link, useNavigate } from "react-router-dom";
-// import useAuthStore from "../store/AuthStore";
-
-// const Dashboard = () => {
-//   const { user, setUser, setToken } = useAuthStore();
-//   const navigate = useNavigate();
-
-//   const handleLogout = () => {
-//     setUser(null);
-//     setToken(null);
-//     navigate("/login");
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-background">
-//       {/* 🔹 Navbar */}
-//       <nav className="bg-primary text-black px-6 py-3 shadow-md">
-//         <div className="max-w-6xl mx-auto flex justify-between items-center">
-//           {/* Brand / Logo */}
-//           <Link
-//             to="/dashboard"
-//             className="text-xl font-bold tracking-wide hover:text-neutral-light"
-//           >
-//             BrandPromo
-//           </Link>
-
-//           {/* Links */}
-//           <div className="flex gap-6 items-center">
-//             <Link
-//               to="/tools"
-//               className="hover:text-primary-light transition-colors"
-//             >
-//               Tools
-//             </Link>
-//             <Link
-//               to="/bookmarks"
-//               className="hover:text-primary-light transition-colors"
-//             >
-//               Bookmarks
-//             </Link>
-//             <Link
-//               to="/dashboard"
-//               className="hover:text-primary-light transition-colors"
-//             >
-//               Profile
-//             </Link>
-//             <button
-//               onClick={handleLogout}
-//               className="bg-white text-primary px-4 py-1 rounded-lg font-medium hover:bg-neutral-light transition"
-//             >
-//               Logout
-//             </button>
-//           </div>
-//         </div>
-//       </nav>
-
-//       {/* 🔹 Page Content */}
-//       <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg mt-6">
-//         <div className="mb-6">
-//           <h1 className="text-3xl font-bold text-neutral-dark">
-//             Welcome, {user?.name}! 👋
-//           </h1>
-//           <p className="text-lg text-neutral">
-//             You are logged in as <strong>{user?.role}</strong>.
-//           </p>
-//         </div>
-
-//         <div className="bg-neutral-light p-6 rounded-lg border border-gray-200">
-//           <h2 className="text-2xl font-semibold mb-3 text-neutral-dark">
-//             Your Profile
-//           </h2>
-//           <p>
-//             <strong>Name:</strong> {user.name}
-//           </p>
-//           <p>
-//             <strong>Email:</strong> {user.email}
-//           </p>
-//           <p>
-//             <strong>Role:</strong> {user.role}
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Dashboard;
 import React from "react";
-import useAuthStore from "../store/AuthStore";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
-  const { user } = useAuthStore();
+  const { user } = useSelector((state) => state.auth);
+
+  console.log('📊 Dashboard - User from Redux:', user);
 
   return (
-    <div className="min-h-screen bg-background">
-
-      {/* 🔹 Page Content */}
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg mt-6">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-neutral-dark">
-            Welcome, {user?.name}! 👋
-          </h1>
-          <p className="text-lg text-neutral">
-            You are logged in as <strong>{user?.role}</strong>.
-          </p>
+    <div className="min-h-screen bg-background p-6">
+      <div className="max-w-4xl mx-auto space-y-6">
+        {/* Welcome Card */}
+        <div className="bg-card rounded-lg shadow-md p-8">
+          <h1 className="text-3xl font-bold text-foreground mb-6">Dashboard</h1>
+          {user ? (
+            <div className="space-y-4">
+              <div className="border-b border-border pb-4">
+                <h2 className="text-xl font-semibold text-foreground">
+                  Welcome back, {user.name}! 👋
+                </h2>
+                <p className="text-muted-foreground mt-1">{user.email}</p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  <strong>Role:</strong>{" "}
+                  <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20">
+                    {user.role}
+                  </span>
+                </p>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Loading user information...</p>
+          )}
         </div>
 
-        <div className="bg-neutral-light p-6 rounded-lg border border-gray-200">
-          <h2 className="text-2xl font-semibold mb-3 text-neutral-dark">
-            Your Profile
-          </h2>
-          <p>
-            <strong>Name:</strong> {user?.name}
-          </p>
-          <p>
-            <strong>Email:</strong> {user?.email}
-          </p>
-          <p>
-            <strong>Role:</strong> {user?.role}
-          </p>
+        {/* Quick Actions */}
+        <div className="bg-card rounded-lg shadow-md p-8">
+          <h2 className="text-xl font-bold text-foreground mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              to="/tools"
+              className="flex flex-col items-center justify-center p-6 bg-primary/5 hover:bg-primary/10 rounded-lg transition border border-primary/20"
+            >
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+              <span className="font-semibold text-foreground">Browse Tools</span>
+              <span className="text-sm text-muted-foreground">Discover AI tools</span>
+            </Link>
+
+            <Link
+              to="/bookmarks"
+              className="flex flex-col items-center justify-center p-6 bg-primary/5 hover:bg-primary/10 rounded-lg transition border border-primary/20"
+            >
+              <svg className="w-12 h-12 text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
+              <span className="font-semibold text-foreground">My Bookmarks</span>
+              <span className="text-sm text-muted-foreground">Saved collections</span>
+            </Link>
+
+            {user?.role === "startup" && (
+              <Link
+                to="/tools/new"
+                className="flex flex-col items-center justify-center p-6 bg-green-50 hover:bg-green-100 rounded-lg transition border border-green-200"
+              >
+                <svg className="w-12 h-12 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                <span className="font-semibold text-green-700">Add New Tool</span>
+                <span className="text-sm text-green-600">Submit your tool</span>
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Stats (placeholder for future) */}
+        <div className="bg-card rounded-lg shadow-md p-8">
+          <h2 className="text-xl font-bold text-foreground mb-4">Your Activity</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">0</div>
+              <div className="text-sm text-blue-700">Tools Reviewed</div>
+            </div>
+            <div className="p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">0</div>
+              <div className="text-sm text-purple-700">Bookmarks</div>
+            </div>
+            <div className="p-4 bg-orange-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600">0</div>
+              <div className="text-sm text-orange-700">Tools Submitted</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

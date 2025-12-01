@@ -19,7 +19,7 @@ const router = express.Router();
 router.get("/tools/:toolId", getToolReviews);
 
 // Protected routes (require authentication)
-router.post("/tools/:toolId/reviews", authenticateToken, createReview);
+router.post("/tools/:toolId", authenticateToken, createReview);
 router.put("/reviews/:reviewId", authenticateToken, updateReview);
 router.delete("/reviews/:reviewId", authenticateToken, deleteReview);
 router.put("/reviews/:reviewId/helpful", authenticateToken, markHelpful);

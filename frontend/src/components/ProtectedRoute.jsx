@@ -2,19 +2,19 @@
 
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import useAuthStore from '../store/AuthStore';
+import { useSelector } from 'react-redux';
 
-const ProtectedRoute = ({ allowedRoles }) => {
-  const { user, token } = useAuthStore();
-  
-  if (!token) {
+const ProtectedRoute = () => {
+  const { user, token } = useSelector((state) => state.auth);
+
+  console.log('🔒 ProtectedRoute check:', { hasUser: !!user, hasToken: !!token });
+
+  if (!user || !token) {
+    console.log('❌ Redirecting to login - no auth');
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && (!user || !allowedRoles.includes(user.role))) {
-    return <div className="text-center p-8 text-red-600">You don't have permission to view this page.</div>;
-  }
-
+  console.log('✅ ProtectedRoute: Rendering children via Outlet');
   return <Outlet />;
 };
 
