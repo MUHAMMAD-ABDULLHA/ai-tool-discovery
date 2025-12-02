@@ -52,18 +52,18 @@ const ReviewManagement = () => {
     return (
         <div className="w-full">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-white text-3xl font-bold mb-2">⭐ Review Management</h1>
-                <p className="text-white/80">Moderate reviews and handle reports</p>
+                <h1 className="text-black text-3xl font-bold mb-2">⭐ Review Management</h1>
+                <p className="text-black/80">Moderate reviews and handle reports</p>
             </div>
 
             <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
                 <div className="flex gap-2">
                     {['pending', 'approved', 'reported', 'all'].map(f => (
-                        <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg capitalize ${filter === f ? 'bg-gradient-to-r from-primary to-primary-dark text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}>{f}</button>
+                        <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg capitalize font-medium transition-colors ${filter === f ? 'bg-accent-faded text-primary' : 'bg-white/10 text-neutral-600 hover:bg-neutral-100'}`}>{f}</button>
                     ))}
                 </div>
                 {selected.length > 0 && (
-                    <button onClick={handleBulkDelete} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">Delete Selected ({selected.length})</button>
+                    <button onClick={handleBulkDelete} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-black rounded-lg">Delete Selected ({selected.length})</button>
                 )}
             </div>
 
@@ -95,8 +95,8 @@ const ReviewManagement = () => {
                                     </td>
                                     <td className="p-3">
                                         <div className="flex gap-2">
-                                            {review.status !== 'approved' && <button onClick={() => handleStatusChange(review._id, 'approved')} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded text-sm">✓</button>}
-                                            {review.status !== 'rejected' && <button onClick={() => handleStatusChange(review._id, 'rejected')} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-sm">✗</button>}
+                                            {review.status !== 'approved' && <button onClick={() => handleStatusChange(review._id, 'approved')} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-black rounded text-sm">✓</button>}
+                                            {review.status !== 'rejected' && <button onClick={() => handleStatusChange(review._id, 'rejected')} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-black rounded text-sm">✗</button>}
                                         </div>
                                     </td>
                                 </tr>

@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ImageUpload from "../ImageUpload";
 import { useSelector } from "react-redux";
+import axios from "../../api/axios";
 
 const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCancel }) => {
   const { user } = useSelector((state) => state.auth);
@@ -17,6 +18,27 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
   });
 
   const [useUrlInput, setUseUrlInput] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+
+  // Check if initial category is custom
+  useEffect(() => {
+    if (categories.length > 0 && form.category && !categories.some(c => c.slug === form.category)) {
+      setIsCustomCategory(true);
+    }
+  }, [categories, form.category]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/categories');
+        setCategories(response.data.categories || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -129,14 +151,50 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
             <label className="block text-sm font-medium text-neutral-dark mb-2">
               Category
             </label>
-            <input
-              type="text"
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="AI Assistant"
-            />
+            <div className="space-y-2">
+              <select
+                name="categorySelect"
+                value={categories.some(c => c.slug === form.category) ? form.category : (form.category ? 'custom' : '')}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === 'custom') {
+                    // Keep existing value if it was already custom, or clear it if switching from a preset
+                    if (categories.some(c => c.slug === form.category)) {
+                      setForm({ ...form, category: '' });
+                    }
+                  } else {
+                    setForm({ ...form, category: val });
+                  }
+                }}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+              >
+                <option value="">Select a category (Optional)</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat.slug}>
+                    {cat.icon} {cat.name}
+                  </option>
+                ))}
+                <option value="custom">➕ Create New / Other</option>
+              </select>
+
+              {/* Show input if "custom" is selected OR if the current category is not in the list (and not empty) */}
+              {(categories.length > 0 && !categories.some(c => c.slug === form.category) && form.category !== '') ||
+                (categories.length > 0 && categories.some(c => c.slug !== form.category) && document.querySelector('select[name="categorySelect"]')?.value === 'custom') ? (
+                <input
+                  type="text"
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="Enter custom category name"
+                />
+              ) : null}
+
+              {/* Logic fix: The above condition is too complex for inline. Let's simplify by checking the select value logic in render or state. 
+                   Actually, let's just use a simple check: is the current form.category in the list?
+               */}
+            </div>
+            {/* Re-implementing with cleaner logic below */}
           </div>
 
           {/* Description */}

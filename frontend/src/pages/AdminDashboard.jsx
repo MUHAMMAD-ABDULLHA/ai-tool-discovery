@@ -8,6 +8,7 @@ import ReviewManagement from '../components/Admin/ReviewManagement';
 import AnalyticsDashboard from '../components/Admin/AnalyticsDashboard';
 import MonetizationControl from '../components/Admin/MonetizationControl';
 import ReportManagement from '../components/Admin/ReportManagement';
+import CategoryManagement from '../components/Admin/CategoryManagement';
 
 const AdminDashboard = () => {
     const { user } = useSelector((state) => state.auth);
@@ -19,7 +20,7 @@ const AdminDashboard = () => {
     }
 
     return (
-        <div className="flex min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800">
+        <div className="flex min-h-screen bg-background text-foreground">
             <AdminSidebar
                 collapsed={sidebarCollapsed}
                 onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -30,6 +31,7 @@ const AdminDashboard = () => {
                     <Route index element={<AnalyticsDashboard />} />
                     <Route path="tools" element={<ToolModeration />} />
                     <Route path="users" element={<UserManagement />} />
+                    <Route path="categories" element={<CategoryManagement />} />
                     <Route path="reviews" element={<ReviewManagement />} />
                     <Route path="analytics" element={<AnalyticsDashboard />} />
                     <Route path="monetization" element={<MonetizationControl />} />

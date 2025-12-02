@@ -40,14 +40,14 @@ const MonetizationControl = () => {
     return (
         <div className="w-full">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-white text-3xl font-bold mb-2">💰 Monetization Control</h1>
-                <p className="text-white/80">Manage featured placements and sponsored content</p>
+                <h1 className="text-black text-3xl font-bold mb-2">💰 Monetization Control</h1>
+                <p className="text-black/80">Manage featured placements and sponsored content</p>
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-xl mb-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-2xl font-bold text-neutral-900">Featured Tools</h2>
-                    <button onClick={handleSetFeatured} className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg">+ Add Featured Tool</button>
+                    <button onClick={handleSetFeatured} className="px-4 py-2 bg-primary hover:bg-primary-dark text-black rounded-lg">+ Add Featured Tool</button>
                 </div>
                 {loading ? <p className="text-center py-8">Loading...</p> : featuredTools.length === 0 ? <p className="text-center py-8 text-neutral-500">No featured tools</p> : (
                     <table className="w-full">
@@ -71,7 +71,7 @@ const MonetizationControl = () => {
                                     <td className="p-3">{tool.category || 'N/A'}</td>
                                     <td className="p-3">{tool.featuredUntil ? new Date(tool.featuredUntil).toLocaleDateString() : 'Indefinite'}</td>
                                     <td className="p-3">
-                                        <button onClick={async () => { await removeFeaturedTool(tool._id); loadData(); }} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded">Remove</button>
+                                        <button onClick={async () => { await removeFeaturedTool(tool._id); loadData(); }} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-black rounded">Remove</button>
                                     </td>
                                 </tr>
                             ))}
@@ -87,7 +87,7 @@ const MonetizationControl = () => {
                         const toolId = prompt('Enter Tool ID:');
                         const sponsor = prompt('Sponsor name:');
                         if (toolId && sponsor) { await setSponsoredTool(toolId, sponsor); loadData(); }
-                    }} className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg">+ Add Sponsored Tool</button>
+                    }} className="px-4 py-2 bg-primary hover:bg-primary-dark text-black rounded-lg">+ Add Sponsored Tool</button>
                 </div>
                 {loading ? <p className="text-center py-8">Loading...</p> : sponsoredTools.length === 0 ? <p className="text-center py-8 text-neutral-500">No sponsored tools</p> : (
                     <table className="w-full">

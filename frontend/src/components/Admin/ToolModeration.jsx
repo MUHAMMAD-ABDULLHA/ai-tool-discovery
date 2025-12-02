@@ -70,18 +70,17 @@ const ToolModeration = () => {
     return (
         <div className="w-full">
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-white text-3xl font-bold mb-2">🔧 Tool Moderation</h1>
-                <p className="text-white/80">Approve, reject, or manage tool submissions</p>
+                <h1 className="text-black text-3xl font-bold mb-2">🔧 Tool Moderation</h1>
+                <p className="text-black/80">Approve, reject, or manage tool submissions</p>
             </div>
-
             <div className="flex gap-3 mb-8">
                 {['pending', 'approved', 'rejected', 'all'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
                         className={`px-6 py-2 rounded-lg capitalize transition-all ${filter === f
-                                ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-accent-faded text-primary font-medium shadow-sm'
+                            : 'bg-white/10 text-neutral-600 hover:bg-neutral-100'
                             }`}
                     >
                         {f}
@@ -123,8 +122,8 @@ const ToolModeration = () => {
                                         <td className="p-3">{tool.userId?.name || 'Unknown'}</td>
                                         <td className="p-3">
                                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tool.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                    tool.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                        'bg-yellow-100 text-yellow-800'
+                                                tool.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                    'bg-yellow-100 text-yellow-800'
                                                 }`}>
                                                 {tool.status}
                                             </span>
@@ -134,15 +133,15 @@ const ToolModeration = () => {
                                             <div className="flex gap-2">
                                                 {tool.status === 'pending' && (
                                                     <>
-                                                        <button onClick={() => handleApprove(tool._id)} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm">
+                                                        <button onClick={() => handleApprove(tool._id)} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-black rounded-lg text-sm">
                                                             ✓ Approve
                                                         </button>
-                                                        <button onClick={() => setRejectModal(tool._id)} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm">
+                                                        <button onClick={() => setRejectModal(tool._id)} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-black rounded-lg text-sm">
                                                             ✗ Reject
                                                         </button>
                                                     </>
                                                 )}
-                                                <button onClick={() => handleDelete(tool._id)} className="px-3 py-1 bg-red-400 hover:bg-red-500 text-white rounded-lg text-sm">
+                                                <button onClick={() => handleDelete(tool._id)} className="px-3 py-1 bg-red-400 hover:bg-red-500 text-black rounded-lg text-sm">
                                                     🗑️
                                                 </button>
                                             </div>
@@ -156,29 +155,31 @@ const ToolModeration = () => {
             </div>
 
             {/* Reject Modal */}
-            {rejectModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setRejectModal(null)}>
-                    <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="text-2xl font-bold mb-4 text-neutral-900">Reject Tool</h2>
-                        <textarea
-                            placeholder="Reason for rejection..."
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            rows="4"
-                            className="w-full p-3 border border-neutral-300 rounded-lg mb-4"
-                        />
-                        <div className="flex gap-3 justify-end">
-                            <button onClick={() => setRejectModal(null)} className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-lg">
-                                Cancel
-                            </button>
-                            <button onClick={handleReject} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg">
-                                Reject Tool
-                            </button>
+            {
+                rejectModal && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setRejectModal(null)}>
+                        <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+                            <h2 className="text-2xl font-bold mb-4 text-neutral-900">Reject Tool</h2>
+                            <textarea
+                                placeholder="Reason for rejection..."
+                                value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                                rows="4"
+                                className="w-full p-3 border border-neutral-300 rounded-lg mb-4"
+                            />
+                            <div className="flex gap-3 justify-end">
+                                <button onClick={() => setRejectModal(null)} className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-lg text-black">
+                                    Cancel
+                                </button>
+                                <button onClick={handleReject} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-black rounded-lg">
+                                    Reject Tool
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

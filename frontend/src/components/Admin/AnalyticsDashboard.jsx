@@ -50,14 +50,14 @@ const AnalyticsDashboard = () => {
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
-                <div className="text-white text-xl">Loading analytics...</div>
+                <div className="text-black text-xl">Loading analytics...</div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-500/20 border border-red-500 text-white p-6 rounded-lg">
+            <div className="bg-red-500/20 border border-red-500 text-black p-6 rounded-lg">
                 <h3 className="font-bold text-lg mb-2">Error Loading Analytics</h3>
                 <p>{error}</p>
                 <button onClick={loadData} className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg">
@@ -70,9 +70,9 @@ const AnalyticsDashboard = () => {
     return (
         <div className="w-full">
             {/* Header */}
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-white text-3xl font-bold mb-2">Analytics Dashboard</h1>
-                <p className="text-white/80">Monitor your platform's performance and metrics</p>
+            <div className="bg-card rounded-2xl p-6 mb-8 border border-border shadow-sm">
+                <h1 className="text-card-foreground text-3xl font-bold mb-2">Analytics Dashboard</h1>
+                <p className="text-muted-foreground">Monitor your platform's performance and metrics</p>
             </div>
 
             {/* Time Range Selector */}
@@ -82,8 +82,8 @@ const AnalyticsDashboard = () => {
                         key={d}
                         onClick={() => setDays(d)}
                         className={`px-6 py-2 rounded-lg transition-all ${days === d
-                                ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-lg'
-                                : 'bg-white/10 text-white hover:bg-white/20'
+                            ? 'bg-primary text-primary-foreground shadow-md'
+                            : 'bg-card text-card-foreground border border-border hover:bg-secondary'
                             }`}
                     >
                         Last {d} Days
@@ -93,105 +93,105 @@ const AnalyticsDashboard = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">👥</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">👥</div>
                         <div>
-                            <h3 className="text-3xl font-bold text-neutral-900">{stats?.totalUsers || 0}</h3>
-                            <p className="text-neutral-600 text-sm">Total Users</p>
+                            <h3 className="text-3xl font-bold text-card-foreground">{stats?.totalUsers || 0}</h3>
+                            <p className="text-muted-foreground text-sm">Total Users</p>
                             <span className="text-green-600 text-xs font-semibold">+{stats?.newUsersLast30Days || 0} this month</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">🔧</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">🔧</div>
                         <div>
-                            <h3 className="text-3xl font-bold text-neutral-900">{stats?.approvedTools || 0}</h3>
-                            <p className="text-neutral-600 text-sm">Approved Tools</p>
+                            <h3 className="text-3xl font-bold text-card-foreground">{stats?.approvedTools || 0}</h3>
+                            <p className="text-muted-foreground text-sm">Approved Tools</p>
                             <span className="text-blue-600 text-xs font-semibold">+{stats?.newToolsLast30Days || 0} this month</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">⏳</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">⏳</div>
                         <div>
                             <h3 className="text-3xl font-bold text-orange-600">{stats?.pendingTools || 0}</h3>
-                            <p className="text-neutral-600 text-sm">Pending Approval</p>
+                            <p className="text-muted-foreground text-sm">Pending Approval</p>
                             <span className="text-orange-600 text-xs font-semibold">Needs attention</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">⭐</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">⭐</div>
                         <div>
-                            <h3 className="text-3xl font-bold text-neutral-900">{reviewStats?.totalReviews || 0}</h3>
-                            <p className="text-neutral-600 text-sm">Total Reviews</p>
+                            <h3 className="text-3xl font-bold text-card-foreground">{reviewStats?.totalReviews || 0}</h3>
+                            <p className="text-muted-foreground text-sm">Total Reviews</p>
                             <span className="text-yellow-600 text-xs font-semibold">Avg: {reviewStats?.averageRating || 0} ⭐</span>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">✅</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">✅</div>
                         <div>
-                            <h3 className="text-3xl font-bold text-neutral-900">{stats?.activeUsers || 0}</h3>
-                            <p className="text-neutral-600 text-sm">Active Users</p>
+                            <h3 className="text-3xl font-bold text-card-foreground">{stats?.activeUsers || 0}</h3>
+                            <p className="text-muted-foreground text-sm">Active Users</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-2xl p-6 shadow-xl hover:shadow-2xl transition-shadow">
+                <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl">📉</div>
+                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">📉</div>
                         <div>
-                            <h3 className="text-3xl font-bold text-neutral-900">{bounceRate?.bounceRate || 0}%</h3>
-                            <p className="text-neutral-600 text-sm">Bounce Rate</p>
-                            <span className="text-neutral-600 text-xs">{bounceRate?.totalSessions || 0} sessions</span>
+                            <h3 className="text-3xl font-bold text-card-foreground">{bounceRate?.bounceRate || 0}%</h3>
+                            <p className="text-muted-foreground text-sm">Bounce Rate</p>
+                            <span className="text-muted-foreground text-xs">{bounceRate?.totalSessions || 0} sessions</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Top Tools */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl mb-8">
-                <h2 className="text-2xl font-bold text-neutral-900 mb-4">🏆 Top Performing Tools</h2>
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border mb-8">
+                <h2 className="text-2xl font-bold text-card-foreground mb-4">🏆 Top Performing Tools</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b-2 border-neutral-200">
-                                <th className="text-left p-3 font-semibold text-neutral-700">Rank</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Tool</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Category</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Impressions</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Clicks</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Engagements</th>
+                            <tr className="border-b border-border">
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Rank</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Tool</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Category</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Impressions</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Clicks</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Engagements</th>
                             </tr>
                         </thead>
                         <tbody>
                             {topTools.length > 0 ? topTools.map((item, index) => (
-                                <tr key={item._id} className="border-b border-neutral-100 hover:bg-neutral-50">
-                                    <td className="p-3">#{index + 1}</td>
+                                <tr key={item._id} className="border-b border-border hover:bg-secondary/50">
+                                    <td className="p-3 text-card-foreground">#{index + 1}</td>
                                     <td className="p-3">
                                         <div className="flex items-center gap-3">
                                             {item.tool?.logo && <img src={item.tool.logo} alt={item.tool?.name} className="w-10 h-10 rounded-lg object-cover" />}
-                                            <span className="font-medium">{item.tool?.name || 'Unknown'}</span>
+                                            <span className="font-medium text-card-foreground">{item.tool?.name || 'Unknown'}</span>
                                         </div>
                                     </td>
-                                    <td className="p-3 text-neutral-600">{item.tool?.category || 'N/A'}</td>
-                                    <td className="p-3">{item.impressions}</td>
-                                    <td className="p-3">{item.clicks}</td>
-                                    <td className="p-3">{item.engagements}</td>
+                                    <td className="p-3 text-muted-foreground">{item.tool?.category || 'N/A'}</td>
+                                    <td className="p-3 text-card-foreground">{item.impressions}</td>
+                                    <td className="p-3 text-card-foreground">{item.clicks}</td>
+                                    <td className="p-3 text-card-foreground">{item.engagements}</td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan="6" className="p-6 text-center text-neutral-500">No tool data available</td>
+                                    <td colSpan="6" className="p-6 text-center text-muted-foreground">No tool data available</td>
                                 </tr>
                             )}
                         </tbody>
@@ -200,29 +200,29 @@ const AnalyticsDashboard = () => {
             </div>
 
             {/* Top Searches */}
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-                <h2 className="text-2xl font-bold text-neutral-900 mb-4">🔍 Top Search Queries</h2>
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
+                <h2 className="text-2xl font-bold text-card-foreground mb-4">🔍 Top Search Queries</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>
-                            <tr className="border-b-2 border-neutral-200">
-                                <th className="text-left p-3 font-semibold text-neutral-700">Rank</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Query</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Search Count</th>
-                                <th className="text-left p-3 font-semibold text-neutral-700">Avg Results</th>
+                            <tr className="border-b border-border">
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Rank</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Query</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Search Count</th>
+                                <th className="text-left p-3 font-semibold text-muted-foreground">Avg Results</th>
                             </tr>
                         </thead>
                         <tbody>
                             {topSearches.length > 0 ? topSearches.map((search, index) => (
-                                <tr key={index} className="border-b border-neutral-100 hover:bg-neutral-50">
-                                    <td className="p-3">#{index + 1}</td>
-                                    <td className="p-3 font-semibold text-neutral-900">{search.query}</td>
-                                    <td className="p-3">{search.count}</td>
-                                    <td className="p-3">{search.avgResults}</td>
+                                <tr key={index} className="border-b border-border hover:bg-secondary/50">
+                                    <td className="p-3 text-card-foreground">#{index + 1}</td>
+                                    <td className="p-3 font-semibold text-card-foreground">{search.query}</td>
+                                    <td className="p-3 text-card-foreground">{search.count}</td>
+                                    <td className="p-3 text-card-foreground">{search.avgResults}</td>
                                 </tr>
                             )) : (
                                 <tr>
-                                    <td colSpan="4" className="p-6 text-center text-neutral-500">No search data available</td>
+                                    <td colSpan="4" className="p-6 text-center text-muted-foreground">No search data available</td>
                                 </tr>
                             )}
                         </tbody>
