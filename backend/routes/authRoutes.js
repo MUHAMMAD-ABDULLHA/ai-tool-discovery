@@ -9,6 +9,13 @@ router.post("/register", async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
+        // Prevent admin registration - admins must be created directly in database
+        if (role === "admin") {
+            return res.status(403).json({
+                message: "Cannot register as admin. Admin accounts must be created by system administrators."
+            });
+        }
+
         // Check if user exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -36,11 +43,11 @@ router.post("/register", async (req, res) => {
             const errors = Object.values(error.errors).map(val => val.message);
             return res.status(400).json({ message: "Validation error", errors });
         }
-        
+
         if (error.code === 11000) {
             return res.status(400).json({ message: "Email already exists" });
         }
-        
+
         res.status(500).json({ message: "Server error", error: error.message });
     }
 });
@@ -60,6 +67,14 @@ router.post("/login", async (req, res) => {
         const isPasswordValid = await user.comparePassword(password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Invalid credentials" });
+        }
+
+        // Check if user is banned
+        if (user.isBanned) {
+            return res.status(403).json({
+                message: "Your account has been banned",
+                reason: user.bannedReason || "Violation of terms"
+            });
         }
 
         // Check if account is active
@@ -105,7 +120,7 @@ router.post("/logout", authenticateToken, async (req, res) => {
         // Remove refresh token from database
         req.user.refreshToken = null;
         await req.user.save();
-        
+
         res.json({ message: "Logged out successfully" });
     } catch (error) {
         res.status(500).json({ message: "Server error", error: error.message });

@@ -15,7 +15,7 @@ const toolAnalyticsSchema = new mongoose.Schema({
 
   eventType: {
     type: String,
-    enum: ["impression", "click", "engagement"],
+    enum: ["impression", "click", "engagement", "view"],
     required: true,
   }, // Type of event
 

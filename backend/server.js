@@ -10,12 +10,20 @@ import reviewRoutes from "./routes/reviewRoutes.js";
 import bookmarkRoutes from "./routes/bookmarkRoutes.js";
 import toolAnalyticsRoutes from "./routes/toolAnalyticsRoutes.js";
 import assetRoutes from "./routes/assetRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
+import paymentRoutes from "./routes/paymentRoutes.js";
+import newsletterRoutes from "./routes/newsletterRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js";
 dotenv.config();
 
 const app = express();
 
 // Middleware
-app.use(express.json());
+app.use(express.json({
+    verify: (req, res, buf) => {
+        req.rawBody = buf;
+    }
+}));
 app.use(cors());
 app.use(cookieParser());
 
@@ -26,6 +34,11 @@ app.use("/reviews", reviewRoutes);
 app.use("/bookmarks", bookmarkRoutes);
 app.use("/analytics", toolAnalyticsRoutes);
 app.use("/assets", assetRoutes);
+app.use("/admin", adminRoutes);
+app.use("/admin", adminRoutes);
+app.use("/payments", paymentRoutes);
+app.use("/newsletter", newsletterRoutes);
+app.use("/categories", categoryRoutes);
 
 // Port config
 const port = process.env.PORT || 5000;
