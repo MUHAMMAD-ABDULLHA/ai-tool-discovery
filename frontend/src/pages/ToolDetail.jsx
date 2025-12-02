@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from '../api/axios';
 import { useSelector } from 'react-redux';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, Flag } from 'lucide-react';
 import SaveToolModal from '../components/SaveToolModal';
 import useBookmarks from '../hooks/Bookmarks';
+import ToolRecommendations from '../components/ToolRecommendations';
 
 const ToolDetail = () => {
   const { toolId } = useParams();
@@ -21,6 +22,26 @@ const ToolDetail = () => {
   const isSaved = bookmarks.some(collection =>
     collection.tools?.some(t => t.tool === toolId || t.tool._id === toolId)
   );
+
+  // Report logic
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportData, setReportData] = useState({ reason: 'broken_link', description: '' });
+
+  const handleReportSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`/tools/${toolId}/report`, reportData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setIsReportModalOpen(false);
+      alert("Report submitted successfully. Thank you!");
+      setReportData({ reason: 'broken_link', description: '' });
+    } catch (error) {
+      console.error("Report error:", error);
+      alert("Failed to submit report. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -100,10 +121,32 @@ const ToolDetail = () => {
           ))}
         </div>
         <p className="text-sm text-gray-500"><strong>Pricing:</strong> {tool.pricing}</p>
-        <div className="mt-6">
+
+        {/* Integrations */}
+        {tool.integrationOptions && tool.integrationOptions.length > 0 && (
+          <div className="mt-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">Integrations:</h3>
+            <div className="flex flex-wrap gap-2">
+              {tool.integrationOptions.map((option, index) => (
+                <span key={index} className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-200">
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 flex items-center justify-between">
           <a href={tool.link} target="_blank" rel="noopener noreferrer" className="bg-indigo-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
             Visit Tool
           </a>
+
+          <button
+            onClick={() => setIsReportModalOpen(true)}
+            className="text-gray-400 hover:text-red-500 text-sm flex items-center gap-1"
+          >
+            <Flag size={16} /> Report Issue
+          </button>
         </div>
       </div>
 
@@ -177,12 +220,64 @@ const ToolDetail = () => {
         )}
       </div>
 
+      {/* Recommendations */}
+      <ToolRecommendations category={tool.category} currentToolId={tool._id} />
+
       {/* Save Modal */}
       <SaveToolModal
         isOpen={isSaveModalOpen}
         onClose={() => setIsSaveModalOpen(false)}
         toolId={toolId}
       />
+
+      {/* Report Modal */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4">Report Issue</h3>
+            <form onSubmit={handleReportSubmit}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Reason</label>
+                <select
+                  className="w-full border rounded p-2"
+                  value={reportData.reason}
+                  onChange={e => setReportData({ ...reportData, reason: e.target.value })}
+                >
+                  <option value="broken_link">Broken Link</option>
+                  <option value="inappropriate_content">Inappropriate Content</option>
+                  <option value="incorrect_info">Incorrect Information</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea
+                  className="w-full border rounded p-2"
+                  rows="3"
+                  value={reportData.description}
+                  onChange={e => setReportData({ ...reportData, description: e.target.value })}
+                  required
+                ></textarea>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(false)}
+                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Submit Report
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

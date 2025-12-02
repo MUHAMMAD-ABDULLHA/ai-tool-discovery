@@ -36,14 +36,14 @@ const Auth = () => {
 
       dispatch(loginSuccess({ token, refreshToken, user }));
       setLoading(false);
-      return true;
+      return { success: true, user }; // Return user data for redirect logic
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed';
       console.error('❌ Login failed:', errorMessage);
       setError(errorMessage);
       dispatch(loginFailure(errorMessage));
       setLoading(false);
-      return false;
+      return { success: false };
     }
   };
 

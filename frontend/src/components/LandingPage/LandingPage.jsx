@@ -1405,7 +1405,7 @@ const LandingPage = () => {
 
     return (
         // Increased container height to prevent clipping due to lower positioned sections (5800px)
-        <div className="font-sans relative bg-background " style={{ width: '1460px', margin: '0 auto', height: '6000px' }}>
+        <div className="font-sans relative bg-background " style={{ width: '1460px', margin: '0 auto', height: '7500px' }}>
 
             {/* --- ABSOLUTE GLOBAL BACKGROUND ELEMENTS (Z-index 0) --- */}
 
@@ -1759,9 +1759,16 @@ const LandingPage = () => {
 
             {/* --- */}
 
+            {/* ## Newsletter Section */}
+            <section className="absolute w-[1394px] z-10" style={{ left: 'calc(58% - 1394px/2)', top: '6200px' }}>
+                <Newsletter />
+            </section>
+
+            {/* --- */}
+
             {/* ## Footer */}
             {/* FINAL ADJUSTMENT: top: 5350px */}
-            <footer className="absolute w-[1479px] h-[434px] bg-footer-bg pt-[66px] px-[101px] z-10" style={{ left: 'calc(50% - 1479px/2)', top: '6100px', color: '#CCCCCC' }}>
+            <footer className="absolute w-[1479px] h-[434px] bg-footer-bg pt-[66px] px-[101px] z-10" style={{ left: 'calc(50% - 1479px/2)', top: '6800px', color: '#CCCCCC' }}>
                 <div className="grid grid-cols-4 gap-10 w-full">
                     {/* About Us (Content 1) */}
                     <div style={{ width: '307.34px' }}>

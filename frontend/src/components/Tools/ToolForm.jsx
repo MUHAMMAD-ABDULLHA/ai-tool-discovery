@@ -2,22 +2,21 @@ import React, { useState } from "react";
 import ImageUpload from "../ImageUpload";
 import { useSelector } from "react-redux";
 
-const ToolForm = ({ onSubmit, token }) => {
+const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCancel }) => {
   const { user } = useSelector((state) => state.auth);
 
   const [form, setForm] = useState({
-    name: "",
-    logo: "",
-    category: "",
-    description: "",
-    pricing: "",
-    useCases: "",
-    link: "",
+    name: initialData?.name || "",
+    logo: initialData?.logo || "",
+    category: initialData?.category || "",
+    description: initialData?.description || "",
+    pricing: initialData?.pricing || "",
+    useCases: initialData?.useCases ? initialData.useCases.join(", ") : "",
+    integrationOptions: initialData?.integrationOptions ? initialData.integrationOptions.join(", ") : "",
+    link: initialData?.link || "",
   });
 
   const [useUrlInput, setUseUrlInput] = useState(false);
-
-  console.log('🔍 ToolForm - Current user from Redux:', user);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +32,7 @@ const ToolForm = ({ onSubmit, token }) => {
     const formattedData = {
       ...form,
       useCases: form.useCases.split(",").map((u) => u.trim()),
+      integrationOptions: form.integrationOptions ? form.integrationOptions.split(",").map((u) => u.trim()) : [],
     };
     onSubmit(formattedData, token);
   };
@@ -41,7 +41,7 @@ const ToolForm = ({ onSubmit, token }) => {
     <div className="min-h-screen bg-background py-10 px-6">
       <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-3xl font-bold text-neutral-dark mb-6">
-          Add New Tool
+          {isEditing ? "Edit Tool" : "Add New Tool"}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Tool Name */}
@@ -184,6 +184,21 @@ const ToolForm = ({ onSubmit, token }) => {
             />
           </div>
 
+          {/* Integration Options */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-dark mb-2">
+              Integrations (comma separated)
+            </label>
+            <input
+              type="text"
+              name="integrationOptions"
+              value={form.integrationOptions || ""}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="e.g. Slack, Zapier, Discord"
+            />
+          </div>
+
           {/* Link */}
           <div>
             <label className="block text-sm font-medium text-neutral-dark mb-2">
@@ -199,13 +214,22 @@ const ToolForm = ({ onSubmit, token }) => {
             />
           </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
-          >
-            Save Tool
-          </button>
+          {/* Action Buttons */}
+          <div className="flex gap-4">
+            <button
+              type="button"
+              onClick={() => onCancel ? onCancel() : window.history.back()}
+              className="w-1/3 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="w-2/3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
+            >
+              {isEditing ? "Update Tool" : "Save Tool"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

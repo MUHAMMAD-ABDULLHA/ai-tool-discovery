@@ -76,7 +76,13 @@ const NavBar = () => {
             Bookmarks
           </Link>
           <Link
-            to="/dashboard"
+            to={
+              user?.role === "startup"
+                ? "/creator/dashboard"
+                : user?.role === "admin"
+                  ? "/admin"
+                  : "/dashboard"
+            }
             className="hover:text-primary-light transition-colors duration-200 font-medium"
           >
             Dashboard
