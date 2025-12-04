@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getPendingTools, getAllTools, approveTool, rejectTool, deleteTool } from '../../api/adminApi';
+import { Check, X, Trash2, ExternalLink } from 'lucide-react';
 
 const ToolModeration = () => {
     const [tools, setTools] = useState([]);
@@ -21,37 +22,26 @@ const ToolModeration = () => {
             setTools(data.tools || []);
         } catch (error) {
             console.error('Error loading tools:', error);
-            alert(error.response?.data?.message || 'Error loading tools');
+            // alert(error.response?.data?.message || 'Error loading tools');
         } finally {
             setLoading(false);
         }
     };
 
-    const handleApprove = async (toolId) => {
-        if (confirm('Approve this tool?')) {
-            try {
-                await approveTool(toolId);
-                loadTools();
-                alert('Tool approved successfully!');
-            } catch (error) {
-                alert('Error approving tool');
-            }
-        }
-    };
-
-    const handleReject = async () => {
-        if (!rejectReason.trim()) {
-            alert('Please provide a rejection reason');
-            return;
-        }
+    const handleAction = async (toolId, action, reason = '') => {
         try {
-            await rejectTool(rejectModal, rejectReason);
-            setRejectModal(null);
-            setRejectReason('');
+            if (action === 'approved') {
+                if (confirm('Approve this tool?')) {
+                    await approveTool(toolId);
+                    alert('Tool approved successfully!');
+                } else return;
+            } else if (action === 'rejected') {
+                await rejectTool(toolId, reason);
+                alert('Tool rejected');
+            }
             loadTools();
-            alert('Tool rejected');
         } catch (error) {
-            alert('Error rejecting tool');
+            alert('Error processing tool');
         }
     };
 
@@ -67,119 +57,200 @@ const ToolModeration = () => {
         }
     };
 
+    const pendingTools = tools; // For compatibility with the previous variable name
+
     return (
-        <div className="w-full">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-black text-3xl font-bold mb-2">🔧 Tool Moderation</h1>
-                <p className="text-black/80">Approve, reject, or manage tool submissions</p>
-            </div>
-            <div className="flex gap-3 mb-8">
-                {['pending', 'approved', 'rejected', 'all'].map(f => (
-                    <button
-                        key={f}
-                        onClick={() => setFilter(f)}
-                        className={`px-6 py-2 rounded-lg capitalize transition-all ${filter === f
-                            ? 'bg-accent-faded text-primary font-medium shadow-sm'
-                            : 'bg-white/10 text-neutral-600 hover:bg-neutral-100'
-                            }`}
-                    >
-                        {f}
-                    </button>
-                ))}
+        <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-border flex justify-between items-center">
+                <h2 className="text-xl font-bold text-card-foreground">Tool Moderation</h2>
+                <div className="flex gap-2">
+                    {['pending', 'approved', 'rejected', 'all'].map(f => (
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`px-3 py-1 rounded-lg text-sm capitalize transition-all ${filter === f
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                                }`}
+                        >
+                            {f}
+                        </button>
+                    ))}
+                </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-xl">
-                {loading ? (
-                    <p className="text-center py-8">Loading tools...</p>
-                ) : tools.length === 0 ? (
-                    <p className="text-center py-8 text-neutral-500">No tools found</p>
-                ) : (
-                    <div className="overflow-x-auto">
+            {loading ? (
+                <div className="p-8 text-center text-muted-foreground">Loading tools...</div>
+            ) : tools.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">No tools found.</div>
+            ) : (
+                <>
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full">
-                            <thead>
-                                <tr className="border-b-2 border-neutral-200">
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Tool</th>
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Category</th>
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Submitted By</th>
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Status</th>
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Date</th>
-                                    <th className="text-left p-3 font-semibold text-neutral-700">Actions</th>
+                            <thead className="bg-secondary/50 border-b border-border">
+                                <tr>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Tool</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Submitted By</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Date</th>
+                                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-border">
                                 {tools.map((tool) => (
-                                    <tr key={tool._id} className="border-b border-neutral-100 hover:bg-neutral-50">
-                                        <td className="p-3">
-                                            <div className="flex items-center gap-3">
-                                                {tool.logo && <img src={tool.logo} alt={tool.name} className="w-12 h-12 rounded-lg object-cover" />}
+                                    <tr key={tool._id} className="hover:bg-secondary/20 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center">
+                                                <img
+                                                    src={tool.logo || "https://via.placeholder.com/40"}
+                                                    alt={tool.name}
+                                                    className="h-10 w-10 rounded-lg object-cover mr-3 border border-border"
+                                                />
                                                 <div>
-                                                    <div className="font-semibold">{tool.name}</div>
-                                                    <div className="text-sm text-neutral-600">{tool.description?.substring(0, 40)}...</div>
+                                                    <div className="font-medium text-foreground">{tool.name}</div>
+                                                    <a href={tool.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1">
+                                                        Visit Website <ExternalLink size={12} />
+                                                    </a>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="p-3">{tool.category || 'N/A'}</td>
-                                        <td className="p-3">{tool.userId?.name || 'Unknown'}</td>
-                                        <td className="p-3">
-                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${tool.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                                tool.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                    'bg-yellow-100 text-yellow-800'
-                                                }`}>
-                                                {tool.status}
-                                            </span>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                                            {tool.userId?.name || 'Unknown'}
                                         </td>
-                                        <td className="p-3 text-sm">{new Date(tool.createdAt).toLocaleDateString()}</td>
-                                        <td className="p-3">
-                                            <div className="flex gap-2">
-                                                {tool.status === 'pending' && (
-                                                    <>
-                                                        <button onClick={() => handleApprove(tool._id)} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-black rounded-lg text-sm">
-                                                            ✓ Approve
-                                                        </button>
-                                                        <button onClick={() => setRejectModal(tool._id)} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-black rounded-lg text-sm">
-                                                            ✗ Reject
-                                                        </button>
-                                                    </>
-                                                )}
-                                                <button onClick={() => handleDelete(tool._id)} className="px-3 py-1 bg-red-400 hover:bg-red-500 text-black rounded-lg text-sm">
-                                                    🗑️
-                                                </button>
-                                            </div>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                                            {new Date(tool.createdAt).toLocaleDateString()}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                            {tool.status === 'pending' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleAction(tool._id, 'approved')}
+                                                        className="text-green-600 hover:text-green-900 bg-green-50 hover:bg-green-100 p-2 rounded-lg transition-colors"
+                                                        title="Approve"
+                                                    >
+                                                        <Check size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setRejectModal(tool._id)}
+                                                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
+                                                        title="Reject"
+                                                    >
+                                                        <X size={18} />
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => handleDelete(tool._id)}
+                                                className="text-neutral-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
-                )}
-            </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden divide-y divide-border">
+                        {tools.map((tool) => (
+                            <div key={tool._id} className="p-4 space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <img
+                                        src={tool.logo || "https://via.placeholder.com/40"}
+                                        alt={tool.name}
+                                        className="h-12 w-12 rounded-lg object-cover border border-border"
+                                    />
+                                    <div>
+                                        <h3 className="font-semibold text-foreground">{tool.name}</h3>
+                                        <a href={tool.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline flex items-center gap-1">
+                                            Visit Website <ExternalLink size={12} />
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between text-sm text-muted-foreground">
+                                    <span>By: {tool.userId?.name || 'Unknown'}</span>
+                                    <span>{new Date(tool.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center pt-2">
+                                    <span className={`px-2 py-1 text-xs font-semibold rounded-full ${tool.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            tool.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                        }`}>
+                                        {tool.status}
+                                    </span>
+
+                                    <div className="flex gap-2">
+                                        {tool.status === 'pending' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleAction(tool._id, 'approved')}
+                                                    className="p-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
+                                                >
+                                                    <Check size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => setRejectModal(tool._id)}
+                                                    className="p-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors"
+                                                >
+                                                    <X size={18} />
+                                                </button>
+                                            </>
+                                        )}
+                                        <button
+                                            onClick={() => handleDelete(tool._id)}
+                                            className="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </>
+            )}
 
             {/* Reject Modal */}
-            {
-                rejectModal && (
-                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setRejectModal(null)}>
-                        <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-                            <h2 className="text-2xl font-bold mb-4 text-neutral-900">Reject Tool</h2>
-                            <textarea
-                                placeholder="Reason for rejection..."
-                                value={rejectReason}
-                                onChange={(e) => setRejectReason(e.target.value)}
-                                rows="4"
-                                className="w-full p-3 border border-neutral-300 rounded-lg mb-4"
-                            />
-                            <div className="flex gap-3 justify-end">
-                                <button onClick={() => setRejectModal(null)} className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 rounded-lg text-black">
-                                    Cancel
-                                </button>
-                                <button onClick={handleReject} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-black rounded-lg">
-                                    Reject Tool
-                                </button>
-                            </div>
+            {rejectModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setRejectModal(null)}>
+                    <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="text-2xl font-bold mb-4 text-card-foreground">Reject Tool</h2>
+                        <textarea
+                            placeholder="Reason for rejection..."
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            rows="4"
+                            className="w-full p-3 border border-input rounded-lg mb-4 bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                        />
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setRejectModal(null)}
+                                className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (rejectReason) {
+                                        handleAction(rejectModal, 'rejected', rejectReason);
+                                        setRejectModal(null);
+                                        setRejectReason('');
+                                    } else {
+                                        alert('Please provide a reason');
+                                    }
+                                }}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                            >
+                                Reject Tool
+                            </button>
                         </div>
                     </div>
-                )
-            }
-        </div >
+                </div>
+            )}
+        </div>
     );
 };
 

@@ -49,18 +49,18 @@ const AnalyticsDashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-black text-xl">Loading analytics...</div>
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-muted-foreground text-xl">Loading analytics...</div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="bg-red-500/20 border border-red-500 text-black p-6 rounded-lg">
+            <div className="bg-red-500/10 border border-red-500/20 text-red-600 p-6 rounded-lg">
                 <h3 className="font-bold text-lg mb-2">Error Loading Analytics</h3>
                 <p>{error}</p>
-                <button onClick={loadData} className="mt-4 px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg">
+                <button onClick={loadData} className="mt-4 px-4 py-2 bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors">
                     Retry
                 </button>
             </div>
@@ -68,20 +68,20 @@ const AnalyticsDashboard = () => {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full space-y-8">
             {/* Header */}
-            <div className="bg-card rounded-2xl p-6 mb-8 border border-border shadow-sm">
+            <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
                 <h1 className="text-card-foreground text-3xl font-bold mb-2">Analytics Dashboard</h1>
                 <p className="text-muted-foreground">Monitor your platform's performance and metrics</p>
             </div>
 
             {/* Time Range Selector */}
-            <div className="flex gap-3 mb-8">
+            <div className="flex gap-3 overflow-x-auto pb-2">
                 {[7, 30, 90].map(d => (
                     <button
                         key={d}
                         onClick={() => setDays(d)}
-                        className={`px-6 py-2 rounded-lg transition-all ${days === d
+                        className={`px-6 py-2 rounded-lg transition-all whitespace-nowrap ${days === d
                             ? 'bg-primary text-primary-foreground shadow-md'
                             : 'bg-card text-card-foreground border border-border hover:bg-secondary'
                             }`}
@@ -92,10 +92,10 @@ const AnalyticsDashboard = () => {
             </div>
 
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">👥</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">👥</div>
                         <div>
                             <h3 className="text-3xl font-bold text-card-foreground">{stats?.totalUsers || 0}</h3>
                             <p className="text-muted-foreground text-sm">Total Users</p>
@@ -106,7 +106,7 @@ const AnalyticsDashboard = () => {
 
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">🔧</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">🔧</div>
                         <div>
                             <h3 className="text-3xl font-bold text-card-foreground">{stats?.approvedTools || 0}</h3>
                             <p className="text-muted-foreground text-sm">Approved Tools</p>
@@ -117,7 +117,7 @@ const AnalyticsDashboard = () => {
 
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">⏳</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">⏳</div>
                         <div>
                             <h3 className="text-3xl font-bold text-orange-600">{stats?.pendingTools || 0}</h3>
                             <p className="text-muted-foreground text-sm">Pending Approval</p>
@@ -128,7 +128,7 @@ const AnalyticsDashboard = () => {
 
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">⭐</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">⭐</div>
                         <div>
                             <h3 className="text-3xl font-bold text-card-foreground">{reviewStats?.totalReviews || 0}</h3>
                             <p className="text-muted-foreground text-sm">Total Reviews</p>
@@ -139,7 +139,7 @@ const AnalyticsDashboard = () => {
 
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">✅</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">✅</div>
                         <div>
                             <h3 className="text-3xl font-bold text-card-foreground">{stats?.activeUsers || 0}</h3>
                             <p className="text-muted-foreground text-sm">Active Users</p>
@@ -149,7 +149,7 @@ const AnalyticsDashboard = () => {
 
                 <div className="bg-card rounded-2xl p-6 shadow-sm border border-border hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
-                        <div className="text-5xl p-3 bg-secondary/50 rounded-xl">📉</div>
+                        <div className="text-4xl p-3 bg-secondary/50 rounded-xl">📉</div>
                         <div>
                             <h3 className="text-3xl font-bold text-card-foreground">{bounceRate?.bounceRate || 0}%</h3>
                             <p className="text-muted-foreground text-sm">Bounce Rate</p>
@@ -160,7 +160,7 @@ const AnalyticsDashboard = () => {
             </div>
 
             {/* Top Tools */}
-            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border mb-8">
+            <div className="bg-card rounded-2xl p-6 shadow-sm border border-border">
                 <h2 className="text-2xl font-bold text-card-foreground mb-4">🏆 Top Performing Tools</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -176,11 +176,11 @@ const AnalyticsDashboard = () => {
                         </thead>
                         <tbody>
                             {topTools.length > 0 ? topTools.map((item, index) => (
-                                <tr key={item._id} className="border-b border-border hover:bg-secondary/50">
+                                <tr key={item._id} className="border-b border-border hover:bg-secondary/20 transition-colors">
                                     <td className="p-3 text-card-foreground">#{index + 1}</td>
                                     <td className="p-3">
                                         <div className="flex items-center gap-3">
-                                            {item.tool?.logo && <img src={item.tool.logo} alt={item.tool?.name} className="w-10 h-10 rounded-lg object-cover" />}
+                                            {item.tool?.logo && <img src={item.tool.logo} alt={item.tool?.name} className="w-10 h-10 rounded-lg object-cover border border-border" />}
                                             <span className="font-medium text-card-foreground">{item.tool?.name || 'Unknown'}</span>
                                         </div>
                                     </td>
@@ -214,7 +214,7 @@ const AnalyticsDashboard = () => {
                         </thead>
                         <tbody>
                             {topSearches.length > 0 ? topSearches.map((search, index) => (
-                                <tr key={index} className="border-b border-border hover:bg-secondary/50">
+                                <tr key={index} className="border-b border-border hover:bg-secondary/20 transition-colors">
                                     <td className="p-3 text-card-foreground">#{index + 1}</td>
                                     <td className="p-3 font-semibold text-card-foreground">{search.query}</td>
                                     <td className="p-3 text-card-foreground">{search.count}</td>

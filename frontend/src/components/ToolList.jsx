@@ -220,12 +220,42 @@ import { useSelector } from 'react-redux';
 import { Bookmark } from 'lucide-react';
 import SaveToolModal from './SaveToolModal';
 import useBookmarks from '../hooks/Bookmarks';
+import NavBar from './NavBar';
+
+// Public header for non-logged-in users
+const PublicHeader = () => (
+  <nav className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center h-16">
+        <div className="flex-shrink-0 flex items-center">
+          <Link to="/tools" className="text-2xl font-bold tracking-wide flex items-center gap-2">
+            AI.Discover
+          </Link>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Link
+            to="/login"
+            className="bg-card text-primary px-4 py-2 rounded-lg font-medium hover:bg-secondary transition-colors"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="bg-primary-foreground/10 text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary-foreground/20 transition-colors"
+          >
+            Sign Up
+          </Link>
+        </div>
+      </div>
+    </div>
+  </nav>
+);
 
 const ToolList = () => {
   const { filteredTools, loading, error } = useTools();
   const { categories, selectedCategory, setSelectedCategory } = useToolStore();
   const { recordEvent } = Analytics();
-  const { token } = useSelector((state) => state.auth);
+  const { token, user } = useSelector((state) => state.auth);
   const { bookmarks } = useBookmarks();
 
   // Modal state
@@ -269,133 +299,138 @@ const ToolList = () => {
     );
   };
 
-  if (loading) return <div className="text-center p-8">Loading tools...</div>;
-  if (error) return <div className="text-center p-8 text-red-600">Error: {error}</div>;
+  if (loading) return <div className="text-center p-8 text-muted-foreground">Loading tools...</div>;
+  if (error) return <div className="text-center p-8 text-destructive">Error: {error}</div>;
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-4xl font-extrabold text-gray-900 text-center mb-8">
-        AI Tool Discovery
-      </h1>
+    <div className="min-h-screen bg-background text-foreground">
+      {/* Conditional Navigation */}
+      {user ? <NavBar /> : <PublicHeader />}
 
-      {/* Category Filter Section */}
-      <div className="flex flex-wrap justify-center gap-2 mb-8">
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full font-medium transition-colors duration-200
-              ${selectedCategory === category
-                ? 'bg-indigo-600 text-white shadow-lg'
-                : 'bg-gray-200 text-gray-700 hover:bg-indigo-100 hover:text-indigo-600'
-              }`}
-          >
-            {category.replace('_', ' ')}
-          </button>
-        ))}
-      </div>
+      <div className="container mx-auto p-4 md:p-8">
+        <h1 className="text-4xl font-extrabold text-foreground text-center mb-8">
+          AI Tool Discovery
+        </h1>
 
-      {/* Tool Cards Grid */}
-      <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {filteredTools.length > 0 ? (
-          filteredTools.map((tool) => {
-            const isSaved = isToolSaved(tool._id);
-            return (
-              <div
-                key={tool._id}
-                data-toolid={tool._id}
-                className="tool-card bg-white rounded-xl shadow-md overflow-hidden p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300 relative group"
-              >
-                {/* Save Button (Absolute Top Right) */}
-                {token && (
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setActiveToolId(tool._id);
-                    }}
-                    className="absolute top-4 right-4 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-gray-100 transition-all z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
-                    title={isSaved ? "Saved" : "Save"}
-                  >
-                    <Bookmark
-                      size={20}
-                      className={isSaved ? "fill-black text-black" : "text-gray-500"}
+        {/* Category Filter Section */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 rounded-full font-medium transition-colors duration-200
+                ${selectedCategory === category
+                  ? 'bg-primary text-primary-foreground shadow-lg'
+                  : 'bg-secondary text-secondary-foreground hover:bg-primary/10 hover:text-primary'
+                }`}
+            >
+              {category.replace('_', ' ')}
+            </button>
+          ))}
+        </div>
+
+        {/* Tool Cards Grid */}
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          {filteredTools.length > 0 ? (
+            filteredTools.map((tool) => {
+              const isSaved = isToolSaved(tool._id);
+              return (
+                <div
+                  key={tool._id}
+                  data-toolid={tool._id}
+                  className="tool-card bg-card rounded-xl shadow-md overflow-hidden p-6 border border-border hover:shadow-xl transition-shadow duration-300 relative group"
+                >
+                  {/* Save Button (Absolute Top Right) - Only for logged in users */}
+                  {user && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setActiveToolId(tool._id);
+                      }}
+                      className="absolute top-4 right-4 p-2 bg-card/80 backdrop-blur-sm rounded-full shadow-sm hover:bg-secondary transition-all z-10 opacity-0 group-hover:opacity-100 focus:opacity-100"
+                      title={isSaved ? "Saved" : "Save"}
+                    >
+                      <Bookmark
+                        size={20}
+                        className={isSaved ? "fill-foreground text-foreground" : "text-muted-foreground"}
+                      />
+                    </button>
+                  )}
+
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={tool.logo}
+                      alt={`${tool.name} logo`}
+                      className="w-12 h-12 rounded-full mr-4 object-cover"
                     />
-                  </button>
-                )}
-
-                <div className="flex items-center mb-4">
-                  <img
-                    src={tool.logo}
-                    alt={`${tool.name} logo`}
-                    className="w-12 h-12 rounded-full mr-4 object-cover"
-                  />
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      {tool.name}
-                    </h2>
-                    <p className="text-sm text-gray-500">
-                      {tool.category.replace('_', ' ')}
+                    <div>
+                      <h2 className="text-xl font-semibold text-card-foreground">
+                        {tool.name}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {tool.category.replace('_', ' ')}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mb-4 line-clamp-3">
+                    {tool.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {tool.useCases.map((useCase, index) => (
+                      <span
+                        key={index}
+                        className="bg-primary/10 text-primary text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                      >
+                        {useCase}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    <p>
+                      <strong className="text-card-foreground">Pricing:</strong> {tool.pricing}
                     </p>
                   </div>
-                </div>
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {tool.description}
-                </p>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {tool.useCases.map((useCase, index) => (
-                    <span
-                      key={index}
-                      className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full"
+                  <div className="mt-4 flex justify-between items-center">
+                    <a
+                      href={tool.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block bg-primary text-primary-foreground text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                      onClick={() =>
+                        token && tool?._id && recordEvent(tool._id, 'click', token)
+                      }
                     >
-                      {useCase}
-                    </span>
-                  ))}
+                      Visit Tool
+                    </a>
+                    <Link
+                      to={`/tools/${tool._id}`}
+                      className="text-primary text-sm font-medium hover:underline"
+                      onClick={() =>
+                        token &&
+                        tool?._id &&
+                        recordEvent(tool._id, 'click', token)
+                      }
+                    >
+                      View Reviews &rarr;
+                    </Link>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">
-                  <p>
-                    <strong>Pricing:</strong> {tool.pricing}
-                  </p>
-                </div>
-                <div className="mt-4 flex justify-between items-center">
-                  <a
-                    href={tool.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                    onClick={() =>
-                      token && tool?._id && recordEvent(tool._id, 'click', token)
-                    }
-                  >
-                    Visit Tool
-                  </a>
-                  <Link
-                    to={`/tools/${tool._id}`}
-                    className="text-indigo-600 text-sm font-medium hover:underline"
-                    onClick={() =>
-                      token &&
-                      tool?._id &&
-                      recordEvent(tool._id, 'click', token)
-                    }
-                  >
-                    View Reviews &rarr;
-                  </Link>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <p className="col-span-full text-center text-gray-500">
-            No tools found for this category.
-          </p>
-        )}
-      </div>
+              );
+            })
+          ) : (
+            <p className="col-span-full text-center text-muted-foreground">
+              No tools found for this category.
+            </p>
+          )}
+        </div>
 
-      {/* Save Modal */}
-      <SaveToolModal
-        isOpen={!!activeToolId}
-        onClose={() => setActiveToolId(null)}
-        toolId={activeToolId}
-      />
+        {/* Save Modal */}
+        <SaveToolModal
+          isOpen={!!activeToolId}
+          onClose={() => setActiveToolId(null)}
+          toolId={activeToolId}
+        />
+      </div>
     </div>
   );
 };

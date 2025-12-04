@@ -60,15 +60,15 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
   };
 
   return (
-    <div className="min-h-screen bg-background py-10 px-6">
-      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-8">
-        <h1 className="text-3xl font-bold text-neutral-dark mb-6">
+    <div className="min-h-screen bg-background py-10 px-4 md:px-6">
+      <div className="max-w-2xl mx-auto bg-card border border-border shadow-lg rounded-2xl p-6 md:p-8">
+        <h1 className="text-3xl font-bold text-card-foreground mb-6">
           {isEditing ? "Edit Tool" : "Add New Tool"}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Tool Name */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Tool Name
             </label>
             <input
@@ -77,7 +77,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               value={form.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="e.g. ChatGPT"
             />
           </div>
@@ -85,7 +85,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
           {/* Logo - Image Upload or URL */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-neutral-dark">
+              <label className="block text-sm font-medium text-card-foreground">
                 Tool Logo
               </label>
               <button
@@ -103,7 +103,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                 name="logo"
                 value={form.logo}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 placeholder="https://example.com/logo.png"
               />
             ) : (
@@ -115,7 +115,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                     tags={["tool", "logo"]}
                   />
                 ) : (
-                  <div className="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
+                  <div className="border border-border rounded-lg p-4 bg-secondary/10">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <img
@@ -124,10 +124,10 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                           className="w-12 h-12 rounded object-cover"
                         />
                         <div>
-                          <p className="text-sm font-medium text-neutral-dark">
+                          <p className="text-sm font-medium text-card-foreground">
                             Logo uploaded successfully
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             Ready to submit
                           </p>
                         </div>
@@ -148,7 +148,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Category
             </label>
             <div className="space-y-2">
@@ -158,7 +158,6 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                 onChange={(e) => {
                   const val = e.target.value;
                   if (val === 'custom') {
-                    // Keep existing value if it was already custom, or clear it if switching from a preset
                     if (categories.some(c => c.slug === form.category)) {
                       setForm({ ...form, category: '' });
                     }
@@ -166,7 +165,7 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                     setForm({ ...form, category: val });
                   }
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-white"
+                className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select a category (Optional)</option>
                 {categories.map((cat) => (
@@ -185,21 +184,16 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
                   name="category"
                   value={form.category}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   placeholder="Enter custom category name"
                 />
               ) : null}
-
-              {/* Logic fix: The above condition is too complex for inline. Let's simplify by checking the select value logic in render or state. 
-                   Actually, let's just use a simple check: is the current form.category in the list?
-               */}
             </div>
-            {/* Re-implementing with cleaner logic below */}
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Description
             </label>
             <textarea
@@ -207,14 +201,14 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               value={form.description}
               onChange={handleChange}
               rows="4"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Short description of the tool..."
             ></textarea>
           </div>
 
           {/* Pricing */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Pricing
             </label>
             <input
@@ -222,14 +216,14 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               name="pricing"
               value={form.pricing}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="Free / Subscription / One-time"
             />
           </div>
 
           {/* Use Cases */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Use Cases (comma separated)
             </label>
             <input
@@ -237,14 +231,14 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               name="useCases"
               value={form.useCases}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="e.g. Content creation, Marketing, Research"
             />
           </div>
 
           {/* Integration Options */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Integrations (comma separated)
             </label>
             <input
@@ -252,14 +246,14 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               name="integrationOptions"
               value={form.integrationOptions || ""}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="e.g. Slack, Zapier, Discord"
             />
           </div>
 
           {/* Link */}
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-2">
+            <label className="block text-sm font-medium text-card-foreground mb-2">
               Tool Link
             </label>
             <input
@@ -267,23 +261,23 @@ const ToolForm = ({ onSubmit, token, initialData = null, isEditing = false, onCa
               name="link"
               value={form.link}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="https://example.com"
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-4">
+          <div className="flex gap-4 pt-4">
             <button
               type="button"
               onClick={() => onCancel ? onCancel() : window.history.back()}
-              className="w-1/3 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition"
+              className="w-1/3 bg-secondary text-secondary-foreground py-3 rounded-lg font-semibold hover:bg-secondary/80 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="w-2/3 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary-dark transition"
+              className="w-2/3 bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
             >
               {isEditing ? "Update Tool" : "Save Tool"}
             </button>

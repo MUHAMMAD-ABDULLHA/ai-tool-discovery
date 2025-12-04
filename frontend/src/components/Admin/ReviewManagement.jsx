@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAllReviews, getReportedReviews, updateReviewStatus, bulkDeleteReviews } from '../../api/adminApi';
+import { Star, Check, X, Trash2, AlertTriangle } from 'lucide-react';
 
 const ReviewManagement = () => {
     const [reviews, setReviews] = useState([]);
@@ -29,7 +30,7 @@ const ReviewManagement = () => {
         try {
             await updateReviewStatus(reviewId, status);
             loadReviews();
-            alert(`Review ${status}`);
+            // alert(`Review ${status}`);
         } catch (error) {
             alert('Error updating review');
         }
@@ -49,60 +50,204 @@ const ReviewManagement = () => {
         }
     };
 
+    const toggleSelection = (id) => {
+        setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    };
+
     return (
-        <div className="w-full">
-            <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 mb-8 border border-white/20">
-                <h1 className="text-black text-3xl font-bold mb-2">⭐ Review Management</h1>
-                <p className="text-black/80">Moderate reviews and handle reports</p>
+        <div className="w-full space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                <h1 className="text-card-foreground text-2xl font-bold mb-2 flex items-center gap-2">
+                    <Star className="text-yellow-500 fill-yellow-500" /> Review Management
+                </h1>
+                <p className="text-muted-foreground">Moderate reviews and handle reports</p>
             </div>
 
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-                <div className="flex gap-2">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="flex flex-wrap gap-2">
                     {['pending', 'approved', 'reported', 'all'].map(f => (
-                        <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg capitalize font-medium transition-colors ${filter === f ? 'bg-accent-faded text-primary' : 'bg-white/10 text-neutral-600 hover:bg-neutral-100'}`}>{f}</button>
+                        <button
+                            key={f}
+                            onClick={() => setFilter(f)}
+                            className={`px-4 py-2 rounded-lg capitalize font-medium transition-colors ${filter === f
+                                    ? 'bg-primary text-primary-foreground shadow-sm'
+                                    : 'bg-card border border-border text-muted-foreground hover:bg-secondary'
+                                }`}
+                        >
+                            {f}
+                        </button>
                     ))}
                 </div>
                 {selected.length > 0 && (
-                    <button onClick={handleBulkDelete} className="px-4 py-2 bg-red-500 hover:bg-red-600 text-black rounded-lg">Delete Selected ({selected.length})</button>
+                    <button
+                        onClick={handleBulkDelete}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2"
+                    >
+                        <Trash2 size={16} /> Delete Selected ({selected.length})
+                    </button>
                 )}
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-xl overflow-x-auto">
-                {loading ? <p className="text-center py-8">Loading...</p> : reviews.length === 0 ? <p className="text-center py-8 text-neutral-500">No reviews found</p> : (
-                    <table className="w-full">
-                        <thead>
-                            <tr className="border-b-2 border-neutral-200">
-                                <th className="p-3"><input type="checkbox" onChange={(e) => setSelected(e.target.checked ? reviews.map(r => r._id) : [])} /></th>
-                                <th className="text-left p-3 font-semibold">Tool</th>
-                                <th className="text-left p-3 font-semibold">User</th>
-                                <th className="text-left p-3 font-semibold">Rating</th>
-                                <th className="text-left p-3 font-semibold">Comment</th>
-                                <th className="text-left p-3 font-semibold">Status</th>
-                                <th className="text-left p-3 font-semibold">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                {loading ? (
+                    <div className="p-8 text-center text-muted-foreground">Loading reviews...</div>
+                ) : reviews.length === 0 ? (
+                    <div className="p-8 text-center text-muted-foreground">No reviews found</div>
+                ) : (
+                    <>
+                        {/* Desktop Table */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-secondary/50 border-b border-border">
+                                    <tr>
+                                        <th className="p-4 w-10">
+                                            <input
+                                                type="checkbox"
+                                                onChange={(e) => setSelected(e.target.checked ? reviews.map(r => r._id) : [])}
+                                                checked={selected.length === reviews.length && reviews.length > 0}
+                                                className="rounded border-input text-primary focus:ring-primary"
+                                            />
+                                        </th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">Tool</th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">User</th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">Rating</th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">Comment</th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">Status</th>
+                                        <th className="text-left p-4 font-semibold text-muted-foreground">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {reviews.map((review) => (
+                                        <tr key={review._id} className="hover:bg-secondary/20 transition-colors">
+                                            <td className="p-4">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selected.includes(review._id)}
+                                                    onChange={() => toggleSelection(review._id)}
+                                                    className="rounded border-input text-primary focus:ring-primary"
+                                                />
+                                            </td>
+                                            <td className="p-4 font-medium text-card-foreground">{review.tool?.name || 'Unknown'}</td>
+                                            <td className="p-4 text-sm text-muted-foreground">{review.user?.name || 'Unknown'}</td>
+                                            <td className="p-4">
+                                                <div className="flex text-yellow-500">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star key={i} size={14} className={i < review.rating ? "fill-current" : "text-muted-foreground/30"} />
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="p-4 max-w-xs truncate text-sm text-muted-foreground" title={review.comment}>
+                                                {review.comment}
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium w-fit ${review.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                            review.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                                'bg-yellow-100 text-yellow-800'
+                                                        }`}>
+                                                        {review.status}
+                                                    </span>
+                                                    {review.reported && (
+                                                        <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium w-fit">
+                                                            <AlertTriangle size={10} /> Reported
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="p-4">
+                                                <div className="flex gap-2">
+                                                    {review.status !== 'approved' && (
+                                                        <button
+                                                            onClick={() => handleStatusChange(review._id, 'approved')}
+                                                            className="p-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors"
+                                                            title="Approve"
+                                                        >
+                                                            <Check size={16} />
+                                                        </button>
+                                                    )}
+                                                    {review.status !== 'rejected' && (
+                                                        <button
+                                                            onClick={() => handleStatusChange(review._id, 'rejected')}
+                                                            className="p-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
+                                                            title="Reject"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-border">
                             {reviews.map((review) => (
-                                <tr key={review._id} className="border-b border-neutral-100 hover:bg-neutral-50">
-                                    <td className="p-3"><input type="checkbox" checked={selected.includes(review._id)} onChange={() => setSelected(prev => prev.includes(review._id) ? prev.filter(x => x !== review._id) : [...prev, review._id])} /></td>
-                                    <td className="p-3 font-medium">{review.tool?.name || 'Unknown'}</td>
-                                    <td className="p-3 text-sm">{review.user?.name || 'Unknown'}</td>
-                                    <td className="p-3">{'⭐'.repeat(review.rating)}</td>
-                                    <td className="p-3 max-w-xs truncate text-sm">{review.comment?.substring(0, 50)}...</td>
-                                    <td className="p-3">
-                                        <span className={`px-2 py-1 rounded text-xs ${review.status === 'approved' ? 'bg-green-100 text-green-800' : review.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{review.status}</span>
-                                        {review.reported && <span className="ml-1 px-2 py-1 bg-red-100 text-red-800 rounded text-xs">Reported</span>}
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="flex gap-2">
-                                            {review.status !== 'approved' && <button onClick={() => handleStatusChange(review._id, 'approved')} className="px-3 py-1 bg-green-500 hover:bg-green-600 text-black rounded text-sm">✓</button>}
-                                            {review.status !== 'rejected' && <button onClick={() => handleStatusChange(review._id, 'rejected')} className="px-3 py-1 bg-red-500 hover:bg-red-600 text-black rounded text-sm">✗</button>}
+                                <div key={review._id} className="p-4 space-y-3">
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                            <input
+                                                type="checkbox"
+                                                checked={selected.includes(review._id)}
+                                                onChange={() => toggleSelection(review._id)}
+                                                className="rounded border-input text-primary focus:ring-primary"
+                                            />
+                                            <div>
+                                                <h3 className="font-semibold text-card-foreground">{review.tool?.name || 'Unknown'}</h3>
+                                                <p className="text-xs text-muted-foreground">by {review.user?.name || 'Unknown'}</p>
+                                            </div>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div className="flex text-yellow-500">
+                                            {[...Array(5)].map((_, i) => (
+                                                <Star key={i} size={14} className={i < review.rating ? "fill-current" : "text-muted-foreground/30"} />
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-secondary/30 p-3 rounded-lg text-sm text-card-foreground">
+                                        "{review.comment}"
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-2">
+                                        <div className="flex gap-2">
+                                            <span className={`px-2 py-1 rounded text-xs font-medium ${review.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                    review.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                        'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                {review.status}
+                                            </span>
+                                            {review.reported && (
+                                                <span className="flex items-center gap-1 px-2 py-1 bg-red-50 text-red-700 rounded text-xs font-medium">
+                                                    <AlertTriangle size={10} /> Reported
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                            {review.status !== 'approved' && (
+                                                <button
+                                                    onClick={() => handleStatusChange(review._id, 'approved')}
+                                                    className="p-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg transition-colors"
+                                                >
+                                                    <Check size={16} />
+                                                </button>
+                                            )}
+                                            {review.status !== 'rejected' && (
+                                                <button
+                                                    onClick={() => handleStatusChange(review._id, 'rejected')}
+                                                    className="p-2 bg-red-50 hover:bg-red-100 text-red-700 rounded-lg transition-colors"
+                                                >
+                                                    <X size={16} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

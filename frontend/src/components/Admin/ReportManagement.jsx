@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios';
-import { Flag, CheckCircle, ExternalLink } from 'lucide-react';
+import { Flag, AlertTriangle, Calendar } from 'lucide-react';
 
 const ReportManagement = () => {
     const [reports, setReports] = useState([]);
@@ -22,81 +22,99 @@ const ReportManagement = () => {
         }
     };
 
-    const handleDismiss = async (reportId) => {
-        // For now, we might not have a dismiss endpoint, but we can simulate it or add one.
-        // Or just delete the report? Let's assume we want to keep it but mark resolved.
-        // Since we didn't add a resolve endpoint, let's just alert for now or maybe delete?
-        // The user didn't specify "resolve" logic, just "see reports".
-        // Let's just show them for now.
-        alert("Dismiss functionality to be implemented (requires backend endpoint)");
-    };
-
-    if (loading) return <div className="p-8 text-center">Loading reports...</div>;
+    if (loading) return <div className="p-8 text-center text-muted-foreground">Loading reports...</div>;
     if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
 
     return (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <Flag className="text-red-500" /> User Reports
-            </h2>
+        <div className="w-full space-y-6">
+            <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                <h2 className="text-2xl font-bold text-card-foreground mb-2 flex items-center gap-2">
+                    <Flag className="text-red-500" /> User Reports
+                </h2>
+                <p className="text-muted-foreground">Review and manage content reported by users</p>
+            </div>
 
-            <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                    <thead>
-                        <tr className="border-b border-gray-200">
-                            <th className="p-4 font-semibold text-gray-600">Tool</th>
-                            <th className="p-4 font-semibold text-gray-600">Reporter</th>
-                            <th className="p-4 font-semibold text-gray-600">Reason</th>
-                            <th className="p-4 font-semibold text-gray-600">Description</th>
-                            <th className="p-4 font-semibold text-gray-600">Date</th>
-                            {/* <th className="p-4 font-semibold text-gray-600">Actions</th> */}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {reports.length > 0 ? (
-                            reports.map((report) => (
-                                <tr key={report._id} className="border-b border-gray-100 hover:bg-gray-50">
-                                    <td className="p-4 font-medium text-indigo-600">
-                                        {report.toolId?.name || 'Unknown Tool'}
-                                    </td>
-                                    <td className="p-4 text-gray-600">
-                                        {report.userId?.name || 'Anonymous'}
-                                        <div className="text-xs text-gray-400">{report.userId?.email}</div>
-                                    </td>
-                                    <td className="p-4">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold 
+            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+                {reports.length === 0 ? (
+                    <div className="p-8 text-center text-muted-foreground">No reports found.</div>
+                ) : (
+                    <>
+                        {/* Desktop Table */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full text-left">
+                                <thead className="bg-secondary/50 border-b border-border">
+                                    <tr>
+                                        <th className="p-4 font-semibold text-muted-foreground">Tool</th>
+                                        <th className="p-4 font-semibold text-muted-foreground">Reporter</th>
+                                        <th className="p-4 font-semibold text-muted-foreground">Reason</th>
+                                        <th className="p-4 font-semibold text-muted-foreground">Description</th>
+                                        <th className="p-4 font-semibold text-muted-foreground">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {reports.map((report) => (
+                                        <tr key={report._id} className="hover:bg-secondary/20 transition-colors">
+                                            <td className="p-4 font-medium text-primary">
+                                                {report.toolId?.name || 'Unknown Tool'}
+                                            </td>
+                                            <td className="p-4 text-card-foreground">
+                                                <div className="font-medium">{report.userId?.name || 'Anonymous'}</div>
+                                                <div className="text-xs text-muted-foreground">{report.userId?.email}</div>
+                                            </td>
+                                            <td className="p-4">
+                                                <span className={`px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1
+                                                    ${report.reason === 'broken_link' ? 'bg-yellow-100 text-yellow-800' :
+                                                        report.reason === 'inappropriate_content' ? 'bg-red-100 text-red-800' :
+                                                            'bg-secondary text-secondary-foreground'}`}>
+                                                    <AlertTriangle size={10} />
+                                                    {report.reason.replace('_', ' ')}
+                                                </span>
+                                            </td>
+                                            <td className="p-4 text-muted-foreground max-w-xs truncate" title={report.description}>
+                                                {report.description}
+                                            </td>
+                                            <td className="p-4 text-muted-foreground text-sm">
+                                                {new Date(report.createdAt).toLocaleDateString()}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Mobile Card View */}
+                        <div className="md:hidden divide-y divide-border">
+                            {reports.map((report) => (
+                                <div key={report._id} className="p-4 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-semibold text-primary">{report.toolId?.name || 'Unknown Tool'}</h3>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1
                                             ${report.reason === 'broken_link' ? 'bg-yellow-100 text-yellow-800' :
                                                 report.reason === 'inappropriate_content' ? 'bg-red-100 text-red-800' :
-                                                    'bg-gray-100 text-gray-800'}`}>
+                                                    'bg-secondary text-secondary-foreground'}`}>
+                                            <AlertTriangle size={10} />
                                             {report.reason.replace('_', ' ')}
                                         </span>
-                                    </td>
-                                    <td className="p-4 text-gray-600 max-w-xs truncate" title={report.description}>
+                                    </div>
+
+                                    <div className="text-sm">
+                                        <div className="font-medium text-card-foreground">{report.userId?.name || 'Anonymous'}</div>
+                                        <div className="text-xs text-muted-foreground">{report.userId?.email}</div>
+                                    </div>
+
+                                    <div className="bg-secondary/30 p-3 rounded-lg text-sm text-card-foreground">
                                         {report.description}
-                                    </td>
-                                    <td className="p-4 text-gray-500 text-sm">
+                                    </div>
+
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground pt-1">
+                                        <Calendar size={12} />
                                         {new Date(report.createdAt).toLocaleDateString()}
-                                    </td>
-                                    {/* <td className="p-4">
-                                        <button 
-                                            onClick={() => handleDismiss(report._id)}
-                                            className="text-gray-400 hover:text-green-600 transition-colors"
-                                            title="Mark as Resolved"
-                                        >
-                                            <CheckCircle size={20} />
-                                        </button>
-                                    </td> */}
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="5" className="p-8 text-center text-gray-500">
-                                    No reports found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         </div>
     );

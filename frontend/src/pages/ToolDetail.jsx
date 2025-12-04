@@ -2,10 +2,39 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from '../api/axios';
 import { useSelector } from 'react-redux';
-import { Bookmark, Flag } from 'lucide-react';
+import { Bookmark, Flag, ExternalLink, Star, MessageSquare } from 'lucide-react';
 import SaveToolModal from '../components/SaveToolModal';
 import useBookmarks from '../hooks/Bookmarks';
 import ToolRecommendations from '../components/ToolRecommendations';
+import NavBar from '../components/NavBar';
+
+const PublicHeader = () => (
+  <nav className="bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center h-16">
+        <div className="flex-shrink-0 flex items-center">
+          <Link to="/tools" className="text-2xl font-bold tracking-wide flex items-center gap-2">
+            AI.Discover
+          </Link>
+        </div>
+        <div className="flex items-center space-x-4">
+          <Link
+            to="/login"
+            className="bg-white text-primary px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="bg-primary-foreground/10 text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary-foreground/20 transition-colors"
+          >
+            Sign Up
+          </Link>
+        </div>
+      </div>
+    </div>
+  </nav>
+);
 
 const ToolDetail = () => {
   const { toolId } = useParams();
@@ -81,203 +110,268 @@ const ToolDetail = () => {
     }
   };
 
-  if (loading) return <div className="text-center p-8">Loading...</div>;
-  if (error) return <div className="text-center p-8 text-red-600">{error}</div>;
-  if (!tool) return <div className="text-center p-8">Tool not found.</div>;
+  if (loading) return <div className="text-center p-8 text-muted-foreground">Loading...</div>;
+  if (error) return <div className="text-center p-8 text-destructive">{error}</div>;
+  if (!tool) return <div className="text-center p-8 text-muted-foreground">Tool not found.</div>;
 
   return (
-    <div className="container mx-auto p-4 md:p-8">
-      <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center mb-4">
-            {tool.logo && <img src={tool.logo} alt={`${tool.name} logo`} className="w-16 h-16 rounded-full mr-4" />}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{tool.name}</h1>
-              <p className="text-md text-gray-500">{tool.category?.replace('_', ' ')}</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background text-foreground">
+      {user ? <NavBar /> : <PublicHeader />}
 
-          {/* Save Button */}
-          {user && (
-            <button
-              onClick={() => setIsSaveModalOpen(true)}
-              className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-              title={isSaved ? "Saved to collection" : "Save to collection"}
-            >
-              <Bookmark
-                size={32}
-                className={isSaved ? "fill-black text-black" : "text-gray-400"}
-              />
-            </button>
-          )}
-        </div>
-
-        <p className="text-gray-700 mb-4">{tool.description}</p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {tool.useCases?.map((useCase, index) => (
-            <span key={index} className="bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">
-              {useCase}
-            </span>
-          ))}
-        </div>
-        <p className="text-sm text-gray-500"><strong>Pricing:</strong> {tool.pricing}</p>
-
-        {/* Integrations */}
-        {tool.integrationOptions && tool.integrationOptions.length > 0 && (
-          <div className="mt-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-2">Integrations:</h3>
-            <div className="flex flex-wrap gap-2">
-              {tool.integrationOptions.map((option, index) => (
-                <span key={index} className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-green-200">
-                  {option}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="mt-6 flex items-center justify-between">
-          <a href={tool.link} target="_blank" rel="noopener noreferrer" className="bg-indigo-600 text-white font-medium px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors">
-            Visit Tool
-          </a>
-
-          <button
-            onClick={() => setIsReportModalOpen(true)}
-            className="text-gray-400 hover:text-red-500 text-sm flex items-center gap-1"
-          >
-            <Flag size={16} /> Report Issue
-          </button>
-        </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold mb-4">Reviews</h2>
-        {user ? (
-          <form onSubmit={handleReviewSubmit} className="mb-6 space-y-4">
-            <h3 className="text-lg font-semibold">Write a Review</h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Title</label>
-              <input
-                type="text"
-                value={newReview.title}
-                onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-                maxLength={100}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Comment</label>
-              <textarea
-                value={newReview.comment}
-                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                rows="3"
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-                maxLength={1000}
-              ></textarea>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Rating</label>
-              <select
-                value={newReview.rating}
-                onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                required
-              >
-                {[5, 4, 3, 2, 1].map(r => <option key={r} value={r}>{r} Stars</option>)}
-              </select>
-            </div>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-              Submit Review
-            </button>
-          </form>
-        ) : (
-          <p className="text-center text-gray-600">
-            Please <Link to="/login" className="text-indigo-600 hover:underline">log in</Link> to leave a review.
-          </p>
-        )}
-
-        {reviews.length > 0 ? (
-          <div className="space-y-4">
-            {reviews.map(review => (
-              <div key={review._id} className="border-b pb-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-semibold">{review.title}</h4>
-                  <span className="text-yellow-500">
-                    {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+      <div className="container mx-auto p-4 md:p-8 space-y-8">
+        {/* Tool Header & Info */}
+        <div className="bg-card border border-border rounded-xl shadow-sm p-6 md:p-8">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+            <div className="flex items-start gap-6">
+              {tool.logo && (
+                <img
+                  src={tool.logo}
+                  alt={`${tool.name} logo`}
+                  className="w-20 h-20 rounded-xl object-cover border border-border bg-secondary/10"
+                />
+              )}
+              <div>
+                <h1 className="text-3xl font-bold text-card-foreground mb-2">{tool.name}</h1>
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                    {tool.category?.replace('_', ' ')}
+                  </span>
+                  <span className="text-muted-foreground text-sm flex items-center gap-1">
+                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                    {tool.averageRating ? tool.averageRating.toFixed(1) : 'New'} ({reviews.length} reviews)
                   </span>
                 </div>
-                <p className="text-sm text-gray-600">{review.comment}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Reviewed by: {review.user?.name || 'Anonymous'}
-                </p>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500">No reviews yet. Be the first to review!</p>
-        )}
-      </div>
+            </div>
 
-      {/* Recommendations */}
-      <ToolRecommendations category={tool.category} currentToolId={tool._id} />
-
-      {/* Save Modal */}
-      <SaveToolModal
-        isOpen={isSaveModalOpen}
-        onClose={() => setIsSaveModalOpen(false)}
-        toolId={toolId}
-      />
-
-      {/* Report Modal */}
-      {isReportModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold mb-4">Report Issue</h3>
-            <form onSubmit={handleReportSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Reason</label>
-                <select
-                  className="w-full border rounded p-2"
-                  value={reportData.reason}
-                  onChange={e => setReportData({ ...reportData, reason: e.target.value })}
-                >
-                  <option value="broken_link">Broken Link</option>
-                  <option value="inappropriate_content">Inappropriate Content</option>
-                  <option value="incorrect_info">Incorrect Information</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                  className="w-full border rounded p-2"
-                  rows="3"
-                  value={reportData.description}
-                  onChange={e => setReportData({ ...reportData, description: e.target.value })}
-                  required
-                ></textarea>
-              </div>
-              <div className="flex justify-end gap-2">
+            <div className="flex gap-3 w-full md:w-auto">
+              {user && (
                 <button
-                  type="button"
-                  onClick={() => setIsReportModalOpen(false)}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded"
+                  onClick={() => setIsSaveModalOpen(true)}
+                  className={`p-3 rounded-lg border transition-colors flex items-center justify-center gap-2 flex-1 md:flex-none ${isSaved
+                    ? "bg-primary/10 border-primary text-primary"
+                    : "bg-secondary border-transparent text-muted-foreground hover:bg-secondary/80"
+                    }`}
+                  title={isSaved ? "Saved to collection" : "Save to collection"}
                 >
-                  Cancel
+                  <Bookmark size={20} className={isSaved ? "fill-current" : ""} />
+                  <span className="md:hidden">Save</span>
                 </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                >
-                  Submit Report
+              )}
+              <a
+                href={tool.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-primary text-primary-foreground font-medium px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 flex-1 md:flex-none"
+              >
+                Visit Website <ExternalLink size={18} />
+              </a>
+            </div>
+          </div>
+
+          <div className="mt-8 space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold text-card-foreground mb-2">About</h2>
+              <p className="text-muted-foreground leading-relaxed">{tool.description}</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-sm font-medium text-card-foreground mb-3">Use Cases</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tool.useCases?.map((useCase, index) => (
+                    <span key={index} className="bg-secondary text-secondary-foreground text-xs font-medium px-3 py-1.5 rounded-lg">
+                      {useCase}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-medium text-card-foreground mb-3">Integrations</h3>
+                <div className="flex flex-wrap gap-2">
+                  {tool.integrationOptions && tool.integrationOptions.length > 0 ? (
+                    tool.integrationOptions.map((option, index) => (
+                      <span key={index} className="bg-secondary text-secondary-foreground border border-border text-xs font-medium px-3 py-1.5 rounded-lg">
+                        {option}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-muted-foreground text-sm">No integrations listed</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-border flex flex-wrap justify-between items-center gap-4">
+              <div className="text-sm">
+                <span className="font-medium text-card-foreground">Pricing: </span>
+                <span className="text-muted-foreground">{tool.pricing}</span>
+              </div>
+
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="text-muted-foreground hover:text-destructive text-sm flex items-center gap-1 transition-colors"
+              >
+                <Flag size={14} /> Report Issue
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="bg-card border border-border rounded-xl shadow-sm p-6 md:p-8">
+          <h2 className="text-2xl font-bold text-card-foreground mb-6 flex items-center gap-2">
+            <MessageSquare className="text-primary" /> Reviews
+          </h2>
+
+          {user ? (
+            <form onSubmit={handleReviewSubmit} className="mb-8 bg-secondary/30 p-6 rounded-xl border border-border">
+              <h3 className="text-lg font-semibold text-card-foreground mb-4">Write a Review</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-card-foreground mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={newReview.title}
+                    onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                    required
+                    maxLength={100}
+                    placeholder="Summarize your experience"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-card-foreground mb-1">Rating</label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewReview({ ...newReview, rating: star })}
+                        className={`p-1 rounded-full transition-colors ${newReview.rating >= star ? 'text-yellow-400' : 'text-muted-foreground/30'}`}
+                      >
+                        <Star size={24} className={newReview.rating >= star ? "fill-current" : ""} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-card-foreground mb-1">Comment</label>
+                  <textarea
+                    value={newReview.comment}
+                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                    rows="3"
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                    required
+                    maxLength={1000}
+                    placeholder="Share your thoughts..."
+                  ></textarea>
+                </div>
+                <button type="submit" className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 font-medium transition-colors">
+                  Submit Review
                 </button>
               </div>
             </form>
-          </div>
+          ) : (
+            <div className="bg-secondary/30 p-6 rounded-xl border border-border text-center mb-8">
+              <p className="text-muted-foreground">
+                Please <Link to="/login" className="text-primary hover:underline font-medium">log in</Link> to leave a review.
+              </p>
+            </div>
+          )}
+
+          {reviews.length > 0 ? (
+            <div className="space-y-6">
+              {reviews.map(review => (
+                <div key={review._id} className="border-b border-border pb-6 last:border-0 last:pb-0">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h4 className="font-semibold text-card-foreground">{review.title}</h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} size={14} className={i < review.rating ? "fill-current" : "text-muted-foreground/30"} />
+                          ))}
+                        </div>
+                        <span className="text-xs text-muted-foreground">• {new Date(review.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{review.comment}</p>
+                  <p className="text-xs text-muted-foreground mt-2 font-medium">
+                    By {review.user?.name || 'Anonymous'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No reviews yet. Be the first to review!
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Recommendations */}
+        <ToolRecommendations category={tool.category} currentToolId={tool._id} />
+
+        {/* Save Modal */}
+        <SaveToolModal
+          isOpen={isSaveModalOpen}
+          onClose={() => setIsSaveModalOpen(false)}
+          toolId={toolId}
+        />
+
+        {/* Report Modal */}
+        {isReportModalOpen && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setIsReportModalOpen(false)}>
+            <div className="bg-card border border-border rounded-xl max-w-md w-full p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+              <h3 className="text-xl font-bold mb-4 text-card-foreground">Report Issue</h3>
+              <form onSubmit={handleReportSubmit}>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium mb-1 text-card-foreground">Reason</label>
+                  <select
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                    value={reportData.reason}
+                    onChange={e => setReportData({ ...reportData, reason: e.target.value })}
+                  >
+                    <option value="broken_link">Broken Link</option>
+                    <option value="inappropriate_content">Inappropriate Content</option>
+                    <option value="incorrect_info">Incorrect Information</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="mb-6">
+                  <label className="block text-sm font-medium mb-1 text-card-foreground">Description</label>
+                  <textarea
+                    className="w-full px-4 py-2 rounded-lg border border-input bg-background text-foreground focus:ring-2 focus:ring-primary focus:outline-none"
+                    rows="3"
+                    value={reportData.description}
+                    onChange={e => setReportData({ ...reportData, description: e.target.value })}
+                    required
+                    placeholder="Please provide details..."
+                  ></textarea>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsReportModalOpen(false)}
+                    className="px-4 py-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground rounded-lg font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90 font-medium transition-colors"
+                  >
+                    Submit Report
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

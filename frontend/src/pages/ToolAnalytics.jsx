@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import axios from '../api/axios';
-import { ArrowLeft, Eye, MousePointer, Star, Calendar } from 'lucide-react';
+import { ArrowLeft, Eye, MousePointer, Star, Calendar, TrendingUp } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const ToolAnalytics = () => {
@@ -28,8 +28,8 @@ const ToolAnalytics = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center">Loading analytics...</div>;
-    if (!data) return <div className="p-8 text-center">Analytics not found</div>;
+    if (loading) return <div className="p-8 text-center text-muted-foreground">Loading analytics...</div>;
+    if (!data) return <div className="p-8 text-center text-muted-foreground">Analytics not found</div>;
 
     const { tool, analytics, reviews } = data;
 
@@ -39,58 +39,66 @@ const ToolAnalytics = () => {
     const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(1) : 0;
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
-            <div className="max-w-6xl mx-auto">
-                <Link to="/creator/dashboard" className="flex items-center text-gray-500 hover:text-gray-900 mb-6">
+        <div className="min-h-screen bg-background p-4 md:p-8">
+            <div className="max-w-6xl mx-auto space-y-8">
+                <Link to="/creator/dashboard" className="flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors">
                     <ArrowLeft size={20} className="mr-2" />
                     Back to Dashboard
                 </Link>
 
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <img
                             src={tool.logo || "https://via.placeholder.com/48"}
                             alt={tool.name}
-                            className="w-12 h-12 rounded-lg object-cover"
+                            className="w-16 h-16 rounded-xl object-cover border border-border"
                         />
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{tool.name} Analytics</h1>
-                            <p className="text-gray-500">Performance overview for the last 30 days</p>
+                            <h1 className="text-2xl font-bold text-card-foreground">{tool.name} Analytics</h1>
+                            <p className="text-muted-foreground">Performance overview for the last 30 days</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Key Metrics */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-medium text-gray-500">Total Views</h3>
-                            <Eye size={20} className="text-blue-500" />
+                            <h3 className="text-sm font-medium text-muted-foreground">Total Views</h3>
+                            <div className="p-2 bg-blue-500/10 rounded-lg">
+                                <Eye size={20} className="text-blue-500" />
+                            </div>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{impressions}</div>
+                        <div className="text-2xl font-bold text-card-foreground">{impressions}</div>
                     </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-medium text-gray-500">Website Clicks</h3>
-                            <MousePointer size={20} className="text-green-500" />
+                            <h3 className="text-sm font-medium text-muted-foreground">Website Clicks</h3>
+                            <div className="p-2 bg-green-500/10 rounded-lg">
+                                <MousePointer size={20} className="text-green-500" />
+                            </div>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{clicks}</div>
+                        <div className="text-2xl font-bold text-card-foreground">{clicks}</div>
                     </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-medium text-gray-500">Click-Through Rate</h3>
-                            <div className="text-purple-500 font-bold">%</div>
+                            <h3 className="text-sm font-medium text-muted-foreground">Click-Through Rate</h3>
+                            <div className="p-2 bg-purple-500/10 rounded-lg">
+                                <TrendingUp size={20} className="text-purple-500" />
+                            </div>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{ctr}%</div>
+                        <div className="text-2xl font-bold text-card-foreground">{ctr}%</div>
                     </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
+                    <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
                         <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-sm font-medium text-gray-500">Avg Rating</h3>
-                            <Star size={20} className="text-yellow-400" />
+                            <h3 className="text-sm font-medium text-muted-foreground">Avg Rating</h3>
+                            <div className="p-2 bg-yellow-500/10 rounded-lg">
+                                <Star size={20} className="text-yellow-500" />
+                            </div>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">
+                        <div className="text-2xl font-bold text-card-foreground">
                             {tool.averageRating?.toFixed(1) || "0.0"}
-                            <span className="text-sm text-gray-400 font-normal ml-2">
+                            <span className="text-sm text-muted-foreground font-normal ml-2">
                                 ({reviews.length} reviews)
                             </span>
                         </div>
@@ -98,26 +106,37 @@ const ToolAnalytics = () => {
                 </div>
 
                 {/* Charts */}
-                <div className="bg-white p-6 rounded-xl shadow-sm mb-8">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6">Views Over Time</h3>
-                    <div className="h-80">
+                <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
+                    <h3 className="text-lg font-bold text-card-foreground mb-6">Views Over Time</h3>
+                    <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={analytics.dailyViews}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                                 <XAxis
                                     dataKey="_id"
                                     tickFormatter={(str) => new Date(str).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                                    stroke="hsl(var(--muted-foreground))"
+                                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
                                 />
-                                <YAxis />
+                                <YAxis
+                                    stroke="hsl(var(--muted-foreground))"
+                                    tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                                />
                                 <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: 'hsl(var(--card))',
+                                        borderColor: 'hsl(var(--border))',
+                                        color: 'hsl(var(--card-foreground))',
+                                        borderRadius: '0.5rem'
+                                    }}
                                     labelFormatter={(label) => new Date(label).toLocaleDateString()}
                                 />
                                 <Line
                                     type="monotone"
                                     dataKey="views"
-                                    stroke="#4F46E5"
+                                    stroke="hsl(var(--primary))"
                                     strokeWidth={2}
-                                    dot={{ r: 4 }}
+                                    dot={{ r: 4, fill: 'hsl(var(--primary))' }}
                                     activeDot={{ r: 6 }}
                                 />
                             </LineChart>
@@ -126,30 +145,30 @@ const ToolAnalytics = () => {
                 </div>
 
                 {/* Reviews */}
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                        <h3 className="text-lg font-bold text-gray-900">Recent Reviews</h3>
+                <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
+                    <div className="px-6 py-4 border-b border-border">
+                        <h3 className="text-lg font-bold text-card-foreground">Recent Reviews</h3>
                     </div>
                     {reviews.length === 0 ? (
-                        <div className="p-8 text-center text-gray-500">No reviews yet</div>
+                        <div className="p-8 text-center text-muted-foreground">No reviews yet</div>
                     ) : (
-                        <div className="divide-y divide-gray-200">
+                        <div className="divide-y divide-border">
                             {reviews.map((review) => (
-                                <div key={review._id} className="p-6">
+                                <div key={review._id} className="p-6 hover:bg-secondary/10 transition-colors">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
-                                            <div className="font-medium text-gray-900">{review.user?.name || "Anonymous"}</div>
-                                            <span className="text-gray-400">•</span>
-                                            <div className="text-sm text-gray-500">
+                                            <div className="font-medium text-card-foreground">{review.user?.name || "Anonymous"}</div>
+                                            <span className="text-muted-foreground">•</span>
+                                            <div className="text-sm text-muted-foreground">
                                                 {new Date(review.createdAt).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        <div className="flex items-center bg-yellow-50 px-2 py-1 rounded">
-                                            <Star size={14} className="text-yellow-400 fill-current mr-1" />
-                                            <span className="font-medium text-yellow-700">{review.rating}</span>
+                                        <div className="flex items-center bg-yellow-500/10 px-2 py-1 rounded-lg">
+                                            <Star size={14} className="text-yellow-500 fill-current mr-1" />
+                                            <span className="font-medium text-yellow-700 dark:text-yellow-500">{review.rating}</span>
                                         </div>
                                     </div>
-                                    <p className="text-gray-600">{review.comment}</p>
+                                    <p className="text-muted-foreground">{review.comment}</p>
                                 </div>
                             ))}
                         </div>
